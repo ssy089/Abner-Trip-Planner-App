@@ -1,12 +1,15 @@
-# Evaluate Articles with NLP - Abner Vinaja
+# Trip Planner App - Abner Vinaja
 
 ## Introduction
-This repository contains my code for the fourth project in [Udacity's Front End Web Developer Nanodegree Program](https://www.udacity.com/course/front-end-web-developer-nanodegree--nd0011). This project creates a simple Natural Language Processing (NLP)
-application that uses the [MeaningCloud Sentiment Analysis API](https://www.meaningcloud.com/developer/sentiment-analysis)
-to generate a sentiment analysis of news articles and/or blog posts. In addition, this project uses [Webpack](https://webpack.js.org/)
-to manage the project's source files and assets. The other main objectives of this project are:
-- Set up development and production environment configurations for the project.
-- Write the project's styles using [Sass](https://sass-lang.com/).
+This repository contains my code for the capstone project in [Udacity's Front End Web Developer Nanodegree Program](https://www.udacity.com/course/front-end-web-developer-nanodegree--nd0011). This project creates a single-page travel application that allows the user to store 
+information about their travel plans, and to see relevant weather information about their destination. This project incorporates the various
+skills and tools that were taught in Udacity's Front End Web Developer Nanodegree Program:
+- Build the webpage's structure using HTML, and style the page using [Sass](https://sass-lang.com/).
+- Use JavaScript methods to manipulate the Document Object Model (DOM), and to provide functionality for the webpage.
+- Incorporate several Application Programming Interfaces (APIs) in order to implement various types of data in the application.
+- Use Node.js to create a local server, and use [Express.js](https://expressjs.com/) to handle middleware and routing functions. 
+- Configure [Webpack](https://webpack.js.org/) to manage the project's source files and assets, and to set up development and production 
+  environment configurations for the project.
 - Implement [Jest](https://jestjs.io/) to execute unit tests for the project.
 
 ## Project Content
@@ -17,10 +20,17 @@ to manage the project's source files and assets. The other main objectives of th
 ## Required Software
 This project requires Node.js v14.15.5 or higher.
 
-Note that in order to gather sentiment analysis data, this project requires an API key for the MeaningCloud Sentiment Analysis API.
-To implement this key, create a .env file in the root directory of the project, and add a `API_KEY` environment variable to
-the .env file. For example, if your API key is 12345, you set the `API_KEY` variable as `API_KEY=12345`. You can sign up for a free 
-API key at the [MeaningCloud Sentiment Analysis API website](https://www.meaningcloud.com/developer/sentiment-analysis).
+Note: In order for the project to generate its data, this project requires a username for the [GeoNames API](http://www.geonames.org/export/),
+an API key for [Weatherbit's Weather API](https://www.weatherbit.io/api), and an API key for [Pixabay's API](https://pixabay.com/api/docs/)
+(see each API's website to find out how to get a free API key). Then, to implement these API keys, create a .env file in the root directory of
+the project, and add the following environment variables to the .env file: `GEONAMES_USERNAME`, `WEATHERBIT_API_KEY`, and `PIXABAY_API_KEY`.
+For example, if your user name for the GeoNames API is sam123, your Weatherbit API key is 12345, and your Pixabay API key is 67890, 
+you would set your environment variables as shown below.
+```
+GEONAMES_USERNAME=sam123
+WEATHERBIT_API_KEY=12345
+PIXABAY_API_KEY=67890
+```
 
 ## Installation
 If Node.js is not installed, go to [Node.js](https://nodejs.org/en/), download the
@@ -51,5 +61,9 @@ The current code has no existing technical issues or bugs.
 This project is currently not under any license.
 
 ## Acknowledgements
-Other than the .gitignore file, all files in this project were developed from scratch. However, the project's architecture is based off of the
-architecture presented by Udacity's [starter code](https://github.com/udacity/fend/tree/refresh-2019/projects/evaluate-news-nlp) for the project.
+The .gitignore file was generated from GitHub's .gitigonore template for Node.js projects.
+
+The following APIs were used for the project:
+- [GeoNames API](http://www.geonames.org/export/) - This was used to retrieve geographic coordinates for any given location.
+- [Weatherbit's Weather API](https://www.weatherbit.io/api) - This was used to retrieve weather forecasts for any given location.
+- [Pixabay's API](https://pixabay.com/api/docs/) - This was used to retrieve a photograph for any given location.

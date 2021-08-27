@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Abner - Trip Planner App</title>
+  </head>
+  <body>
+    <header>
+      <h1>Trip Planner</h1>
+    </header>
+    <main>
+      <form class="user-input">
+        <h3>Specify Your Destination</h3>
+        <div class="input-group">
+          <div class="text-input">
+	    <label for="city">City:</label>
+	    <input type="text" placeholder="Enter a City" id="city">
+	  </div>
+	  <div class="text-input">
+	    <label for="admin-div">Administrative Division (State, Province, etc.):</label>
+	    <input type="text" placeholder="Enter an Administrative Division" id="admin-div">
+	  </div>
+        </div>
+        <div class="input-group">
+          <div class="text-input">
+	    <label for="country">Country:</label>
+	    <input type="text" placeholder="Enter a Country" id="country">
+	  </div>
+	  <div class="text-input">
+	    <label for="trip-title">Title</label>
+	    <input type="text" placeholder="Give Your Trip a Title" id="trip-title">
+	  </div>
+        </div>
+        <h3>Specify Your Trip's Duration</h3>
+        <div class="input-group">
+          <div class="text-input">
+	    <label for="start-date">Start Date:</label>
+	    <input type="text" placeholder="MM/DD/YYYY" id="start-date">
+	  </div>
+	  <div class="text-input">
+	    <label for="end-date">End Date:</label>
+	    <input type="text" placeholder="MM/DD/YYYY" id="end-date">
+	  </div>
+        </div>
+      </form>
+      <form>
+        <h3>Currently Scheduled Trips</h3>
+        <table class="schedule-trips">
+	  <tr>
+	    <th>Title</th>
+	    <th>City</th>
+	    <th>Admin. Division</th>
+	    <th>Country</th>
+	    <th>Start Date</th>
+	    <th>End Date</th>
+	  </tr>
+	  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <div class="button-group">
+          <input type="submit" value="Display Information" id="display-info">
+          <input type="submit" value="Cancel Trip(s)" id="cancel-trip">
+	  <input type="submit" value="Cancel All" id="cancel-all">
+        </div>
+      </form>
+      <section class="trip-display">
+        <h3>Imagine an Amazing Trip!</h3>
+	<h4>Choose Your Destination!</h4>
+	<h5>See How Long You Will Stay!</h5>
+	<img src="" alt="Planes travel across the globe">
+	<figcaption>Image by 
+	  <cite>
+	    <a href="https://pixabay.com/users/kreatikar-8562930/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3411506">Mudassar Iqbal
+	    </a>
+	  </cite>
+	  from 
+	  <cite>
+	    <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3411506">Pixabay
+	    </a>
+	  </cite>
+	</figcaption>
+      </section>
+      <section class="weather-forecast">
+        <h3>Your Destination's Weather Forecast for the Next Two Weeks</h3>
+	<div class="weather-display"></div>
+	<form><input type="submit" value="Update Forecast" id="weather-display"></form>
+      </section>
+      <section class="activity-planner">
+        <h3>Plan Your Activities</h3>
+        <table class="schedule-trips">
+          <tr>
+	    <th>Description</th>
+	    <th>Time</th>
+	    <th>Date</th>
+	  </tr>
+	  <tr><td></td><td></td><td></td></tr>
+        </table>
+	<form>
+	  <input type="submit" value="Cancel Activity" id="cancel-activity">
+          <input type="submit" value="Clear Activities" id="clear-activities">
+	</form>
+	<form>
+	  <h3>Add an Activity</h3>
+	</form>
+      </section>
+    </main>
+    <footer>
+      <p>© 2021 Abner Vinaja</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+/* Styling for the footer of the page */
+footer {
+  background-color: #ff7f50;
+  color: #ffd700;
+  grid-area: ft;
+  height: min-content;
+  margin-top: 2em;
+
+  p {
+    margin: 1em;
+  }
+}

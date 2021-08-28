@@ -1,0 +1,14 @@
+body {
+  background-color: #ffffe0;
+  display: grid;
+  font-family: Rockwell, serif;
+  grid-template-areas:
+  "hd"
+  "mn"
+  "mn"
+  "mn"
+  "ft";
+  grid-template-rows: min-content repeat(3, 1fr) min-content;
+  margin: 0;
+  min-height: 100vh;
+}

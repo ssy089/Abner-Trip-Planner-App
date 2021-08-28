@@ -19,7 +19,7 @@
 	      <input type="text" placeholder="Enter a City" id="city">
 	    </div>
 	    <div class="text-input">
-	      <label for="admin-div">Administrative Division (State, Province, etc.):</label>
+	      <label for="admin-div">*Admin. Division:</label>
 	      <input type="text" placeholder="Enter an Admin. Division" id="admin-div">
 	    </div>
           </div>
@@ -33,6 +33,7 @@
 	      <input type="text" placeholder="Give Your Trip a Title" id="trip-title">
 	    </div>
           </div>
+	  <div class="abbreviation-note">*Administrative Division (State, Province, Prefecture, Member Country of the U.K., etc.)</div>
           <h3>Specify Your Trip's Duration</h3>
           <div class="input-group">
             <div class="text-input">
@@ -51,14 +52,21 @@
         <h3>Currently Scheduled Trips</h3>
         <div class="custom-table">
 	  <div class="custom-table-row custom-table-headers">
-	    <span>Title</span>
-	    <span>City</span>
-	    <span>Admin. Division</span>
-	    <span>Country</span>
-	    <span>Start Date</span>
-	    <span>End Date</span>
+	    <div class="custom-table-entry">Title</div>
+	    <div class="custom-table-entry">City</div>
+	    <div class="custom-table-entry">Admin. Division</div>
+	    <div class="custom-table-entry">Country</div>
+	    <div class="custom-table-entry">Start Date</div>
+	    <div class="custom-table-entry">End Date</div>
 	  </div>
-	  <div class="custom-table-row data-row"></div>
+	  <div class="custom-table-row data-row">
+	    <div class="custom-table-entry"></div>
+	    <div class="custom-table-entry"></div>
+	    <div class="custom-table-entry"></div>
+            <div class="custom-table-entry"></div>
+	    <div class="custom-table-entry"></div>
+	    <div class="custom-table-entry"></div>
+	  </div>
         </div>
 	<form>
           <div class="button-group">
@@ -87,7 +95,9 @@
       </section>
       <section class="weather-forecast">
         <h3>Your Destination's Weather Forecast for the Next Two Weeks</h3>
-	<div class="weather-display"></div>
+	<div class="weather-display">
+	  <div class="forecast-box"></div>
+	</div>
 	<form>
 	  <input type="submit" value="Update Forecast" id="weather-display">
 	</form>
@@ -96,11 +106,15 @@
         <h3>Planned Activities</h3>
         <div class="custom-table">
           <div class="custom-table-row custom-table-headers">
-	    <span>Description</span>
-	    <span>Time</span>
-	    <span>Date</span>
+	    <div class="custom-table-entry description-box">Description</div>
+	    <div class="custom-table-entry">Time</div>
+	    <div class="custom-table-entry">Date</div>
 	  </div>
-	  <div class="custom-table-row data-row"></div>
+	  <div class="custom-table-row data-row">
+	    <div class="custom-table-entry description-box"></div>
+	    <div class="custom-table-entry"></div>
+	    <div class="custom-table-entry"></div>
+	  </div>
         </div>
 	<form>
 	  <div class="button-group">
@@ -111,8 +125,8 @@
         <h3>Add an Activity</h3>
 	<form>
 	  <div class="textarea-input">
-	    <label for="activity-description">Describe Your Activity (Up to 50 Characters)</label>
-	    <textarea id="activity-description" placeholder="What Do You Want to Do?" rows="50" cols="5"></textarea>
+	    <label for="activity-description">Describe Your Activity (Up to 250 Characters)</label>
+	    <textarea id="activity-description" placeholder="What Do You Want to Do?" rows="5" cols="50"></textarea>
 	  </div>
 	  <div class="input-group">
 	    <div class="text-input">

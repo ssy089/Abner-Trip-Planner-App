@@ -11,14 +11,34 @@ form {
 
 input[type="submit"] {
   background-color: #ff7f50;
+  border-color: #ff7f50;
   border-radius: 0.25em;
   color: #ffd700;
   font-weight: bold;
   margin: 1em 0;
 }
 
+input[type="submit"]:hover {
+  border-color: #ffd700;
+}
+
+input[type="text"]:hover {
+  border-color: #ff7f50;
+}
+
 label {
   font-weight: bold;
+}
+
+textarea:hover {
+  border-color: #ff7f50;
+}
+
+.abbreviation-note {
+  align-self: flex-end;
+  font-size: small;
+  margin-bottom: 1em;
+  text-align: end;
 }
 
 .button-group {
@@ -55,5 +75,38 @@ label {
   .input-group {
     flex-direction: column;
     width: min-content;
+  }
+
+  .text-input {
+    margin: 1em 0;
+  }
+
+  .textarea-input {
+    align-items: center;
+
+    label {
+      text-align: center;
+    }
+  }
+}
+
+/* This media query adjusts the styles for tablet-sized browsers. */
+@media(min-width: 601px) and (max-width: 1200px) {
+  .input-group {
+    width: min-content;
+  }
+
+  .text-input {
+    display: flex;
+    flex-direction: column;
+    margin: 1em 1em;
+  }
+
+  .textarea-input {
+    align-items: center;
+
+    label {
+      text-align: center;
+    }
   }
 }

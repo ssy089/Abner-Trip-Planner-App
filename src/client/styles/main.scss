@@ -1,3 +1,7 @@
+a {
+  color: #ff4500;
+}
+
 main {
   align-items: center;
   color: #ff4500;
@@ -34,38 +38,52 @@ section:nth-of-type(even) {
   border: thin solid #ff7f50;
   display: flex;
   flex-direction: column;
-  min-height: 50px;
+  height: min-content;
   width: min-content;
+}
+
+.custom-table-entry {
+  border: thin solid #ff7f50;
+  height: 25px;
+  text-align: center;
+  width: 150px;
 }
 
 .custom-table-headers {
   display: flex;
   flex-direction: row;
+  text-decoration: underline;
 }
 
 .custom-table-row { 
-  height: 25px;
-  width: min-content;
-
-  span {
-    border: thin solid #ff7f50;
-    height: 25px;
-    text-align: center;
-    width: 150px;
-  }
+  display: flex;
+  flex-direction: row;
+  height: min-content;
+  width: min-content; 
 }
 
 .data-row:hover {
   background-color: #add8e6;
 }
 
-.weather-display {
-  background-color: #fff;
+.forecast-box {
+  background-color: #add8e6;
   height: 200px;
   width: 200px;
 }
 
+.weather-display {
+  background-color: #fff;
+  height: min-content;
+  width: 200px;
+}
+
 @media(max-width: 600px) {
+  figcaption {
+    text-align: center;
+    width: 200px;
+  }
+  
   h3 {
     text-align: center;
     width: 250px;
@@ -78,8 +96,11 @@ section:nth-of-type(even) {
 
   .custom-table {
     flex-direction: row;
-    height: min-content;
-    min-width: 300px;
+  }
+
+  .custom-table-entry {
+    height: 75px;
+    width: 100px;
   }
 
   .custom-table-headers {
@@ -87,7 +108,34 @@ section:nth-of-type(even) {
   }
 
   .custom-table-row {
-    height: min-content;
-    min-width: 150px;
-  } 
+    flex-direction: column;
+  }
+
+  .description-box {
+    height: 240px;
+  }
+}
+
+@media(min-width: 601px) and (max-width: 1200px) {
+  img {
+    height: 300px;
+    width: 500px;
+  }
+
+  .custom-table {
+    flex-direction: row;
+  }
+
+  .custom-table-entry {
+    height: 25px;
+    width: 150px;
+  }
+
+  .custom-table-row {
+    flex-direction: column;
+  }
+
+  .description-box {
+    height: 190px;
+  }
 }

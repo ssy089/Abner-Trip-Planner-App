@@ -9,7 +9,7 @@
     "url": "https://github.com/ssy089/Abner-Trip-Planner-App.git"
   },
   "scripts": {
-    "start": "node src/server/index.js",
+    "start": "node src/server/server.js",
     "test": "jest",
     "build-prod": "webpack --config webpack.prod.js",
     "build-dev": "webpack-dev-server --config webpack.dev.js --open"

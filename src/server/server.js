@@ -31,3 +31,78 @@ app.use(express.static('./dist'));
 const server = app.listen(port, function() {
   console.log('Travel App is running on http://localhost:8081');
 });
+
+async function getAPIData(givenBaseURL, givenQuery) {
+  const apiResponse = await fetch(givenBaseURL + givenQuery);
+
+  try {
+    responseData = await apiResponse.json();
+    return responseData;
+  }
+  catch(error) {
+    return error;
+  }
+}
+
+app.post('/geographicCoordinates', function(req, res) {
+  const givenQuery = `&name_equals=${req.body.city}`;
+  getAPIData(geonamesBaseURL, givenQuery).then(function(data) {
+    if(data.totalResultsCount === 0) {
+      res.status = 200;
+      res.json({message: 'The given city was not found.'});
+    }
+    let cityFound = false;
+    let adminDivFound = false;
+    let countryFound = false;
+    let resultFound = [];
+    for(let geoname of data.geonames) {
+      let cityMatch = false;
+      let adminDivMatch = false;
+      let countryMatch = false;
+      if(geoname.name.toLowerCase() === req.body.city.toLowerCase()) {
+        cityMatch = true;
+	cityFound = true;
+      }
+      if(geoname.adminName1.toLowerCase() === req.body.adminDiv.toLowerCase()) {
+        adminDivMatch = true;
+	adminDivFound = true;
+      }
+      if(geoname.countryName.toLowerCase() === req.body.country.toLowerCase()) {
+        countryMatch = true;
+	countryFound = true;
+      }
+      if(cityMatch && (adminDivMatch && countryMatch)) {
+        resultFound.push(geoname);
+	break;
+      }
+    }
+    res.status = 200;
+    if(resultFound.length === 0) {
+      if(!cityFound) {
+	res.json({message: 'The given city was not found.'});
+      }
+      else if(!adminDivFound) {
+        res.json({message: 'The given administrative division was not found.'});
+      }
+      else if(!countryFound) {
+        res.json({message: 'The given country was not found.'});
+      }
+    }
+    else {
+      res.json({
+        message: 'The given location has been located.',
+	locationInfo: {
+	  city: resultFound[0].name,
+	  adminDiv: resultFound[0].adminName1,
+	  country: resultFound[0].countryName,
+	  latitude: resultFound[0].lat,
+	  longitude: resultFound[0].lng
+	}
+      });
+    }
+  }).catch(function(error) {
+    console.log(`Error: ${error}`);
+    res.status = 500;
+    res.json({message: 'An error occurred on the server while processing the data.'});
+  });
+});

@@ -48,6 +48,13 @@ textarea:hover {
   width: 400px;
 }
 
+.error {
+  color: #f00;
+  font-size: small;
+  font-weight: bold;
+  width: 200px;
+}
+
 .input-group {
   display: flex;
   flex-direction: row;

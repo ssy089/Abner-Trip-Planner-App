@@ -1,3 +1,38 @@
+function checkForBlankFields(listOfInputs) {
+  let blankFields = false;
+  for(let givenInput of listOfInputs) {
+    if(givenInput.value.length === 0) {
+      givenInput.insertAdjacentHTML('afterend', '<p class="error">This field is required.</p>');
+      blankFields = true;
+    }
+  }
+  return blankFields;
+}
+
+function checkDateInput(listOfInputs) {
+  let validDateInput = true;
+  const dateFormat = /\d{2}\/\d{2}\/\d{4}/;
+  let dateMatch = null;
+  for(let givenInput of listOfInputs) {
+    dateMatch = givenInput.value.match(dateFormat);
+    if(dateMatch === null) {
+      givenInput.insertAdjacentHTML('afterend', '<p class="error">Please provide the date in the specified format.</p>');
+      validDateInput = false;
+    }
+    dateMatch = null;
+  }
+  return validDateInput;
+}
+
+function getDaysElapsed(startDate, endDate) {
+  let elapsedTime = endDate.getTime() - startDate.getTime();
+  elapsedTime /= 1000;
+  elapsedTime /= 60;
+  elapsedTime /= 60;
+  elapsedTime /= 24;
+  return parseInt(elapsedTime, 10);
+}
+
 async function getServerData(givenData, givenRoute) {
   const serverResponse = await fetch('http://localhost:8081/' + givenRoute, {
     method: 'POST',
@@ -39,7 +74,7 @@ function locationFound(cityInput, adminDivInput, countryInput, serverResponseDat
 	elementId = 'country';
 	break;
     }
-    document.getElementById(elementId).insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}`);
+    document.getElementById(elementId).insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}</p>`);
     return false;
   }
   return true;
@@ -71,6 +106,14 @@ function generateTripData(submitEvent) {
   const tripTitleInput = document.getElementById('trip-title');
   const startDateInput = document.getElementById('start-date');
   const endDateInput = document.getElementById('end-date');
+  const anyBlankFields = checkForBlankFields([cityInput, adminDivInput, countryInput, tripTitleInput, startDateInput, endDateInput]);
+  if(anyBlankFields) {
+    return;
+  }
+  const validDates = checkDateInput([startDateInput, endDateInput]);
+  if(!validDates) {
+    return;
+  }
   const givenInput = {
     city: cityInput.value,
     adminDiv: adminDivInput.value,

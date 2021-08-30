@@ -51,6 +51,93 @@ async function getServerData(givenData, givenRoute) {
   }
 }
 
+function processWeatherData(weatherInfo) {
+  const allWeatherForecasts = [];
+  for(let weatherForecast of weatherInfo) {
+    let dailyForecast = {
+      forecastDate: '',
+      description: weatherForecast.weather.description,
+      iconCode: weatherForecast.weather.icon,
+      iconImage: '',
+      windSpeed: weatherForecast.wind_spd.toFixed() + ' m/s',
+      windDirection: '',
+      maxTemperature: weatherForecast.max_temp + '°C',
+      minTemperature: weatherForecast.min_temp + '°C',
+      probabilityOfPrecipitation: weatherForecast.pop + '%',
+      averagePressure: weatherForecast.pres.toFixed() + ' mb',
+      relativeHumidity: weatherForecast.rh + '%',
+      averageTotalCloudCoverage: weatherForecast.clouds + '%',
+      maxUVIndex: weatherForecast.uv,
+      additionalData: {
+        windGustSpeed: weatherForecast.wind_gust_spd.toFixed() + ' m/s',
+	precipitation: weatherForecast.precip.toFixed() + ' mm',
+	snow: weatherForecast.snow.toFixed() + ' mm',
+	snowDepth: weatherForecast.snow_depth.toFixed() + 'mm',
+	lowLevelCloudCoverage: weatherForecast.clouds_low + '%',
+	visibility: weatherForecast.vis.toFixed() + ' km'
+      }
+    }
+    const dateComponents = weatherForecast.valid_date.split('-');
+    dailyForecast.forecastDate = `${dateComponents[1]}\/${dateComponents[2]}\/${dateComponents[0]}`;
+    
+    const windDirectionComponents = weatherForecast.wind_cdir_full.split('-');
+    dailyForecast.windDirection += `${windDirectionComponents[0].charAt().toUpperCase()}${windDirectionComponents[0].slice(1).toLowerCase()}`;
+    if(windDirectionComponents.length > 1) {
+      for(let someComponent of windDirectionComponents.slice(1)) {
+        dailyForecast.windDirection += `-${someComponent.charAt().toUpperCase()}${someComponent.slice(1).toLowerCase()}`;
+      }
+    }
+
+    if(dailyForecast.iconCode.match(/t0[1-3](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_t01d.png';
+    }
+    else if(dailyForecast.iconCode.match(/t0[4-5](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_t04d.png';
+    }
+    else if(dailyForecast.iconCode.match(/d0[1-3](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_d01d.png';
+    }
+    else if(dailyForecast.iconCode.match(/[fru][0124](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_r01d.png';
+    }
+    else if(dailyForecast.iconCode.match(/r03(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_r03d.png';
+    }
+    else if(dailyForecast.iconCode.match(/r0[4-6](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_r05d.png';
+    }
+    else if(dailyForecast.iconCode.match(/s0[14](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_s01d.png';
+    }
+    else if(dailyForecast.iconCode.match(/s0[23](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_s02d.png';
+    }
+    else if(dailyForecast.iconCode.match(/s05(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_s05d.png';
+    }
+    else if(dailyForecast.iconCode.match(/s06(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_s06d.png';
+    }
+    else if(dailyForecast.iconCode.match(/a0[1-6](d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_a01d.png';
+    }
+    else if(dailyForecast.iconCode.match(/c01(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_c01d.png';
+    }
+    else if(dailyForecast.iconCode.match(/c02(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_c02d.png';
+    }
+    else if(dailyForecast.iconCode.match(/c03(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_c03d.png';
+    }
+    else if(dailyForecast.iconCode.match(/c04(d|n)/)) {
+      dailyForecast.iconImage = 'images/icon_c04d.png';
+    }
+    allWeatherForecasts.push(dailyForecast);
+  }
+  return allWeatherForecasts;
+}
+
 function locationFound(cityInput, adminDivInput, countryInput, serverResponseData) { 
   const errorAdvice = 'Make sure that the name is spelled correctly, that the correct punctuation marks are included, and that abbreviations are avoided. Also, make sure that the given location data is all correct.';
   const notFoundRegExp = /The given ([a-z]*\s*[a-z]+) was not found\./i;
@@ -98,7 +185,8 @@ function generateTripData(submitEvent) {
     longitude: 0.0,
     startDate: '',
     endDate: '',
-    activities: []
+    activities: [],
+    weatherForecasts: []
   };
   const cityInput = document.getElementById('city');
   const adminDivInput = document.getElementById('admin-div');
@@ -129,8 +217,15 @@ function generateTripData(submitEvent) {
     tripData.country = data.locationInfo.country;
     tripData.latitude = data.locationInfo.latitude;
     tripData.longitude = data.locationInfo.longitude;
-    console.log(tripData);
-
+    getServerData({latitude: tripData.latitude, longitude: tripData.longitude}, 'weatherForecast').then(function(weatherData) {
+      console.log(weatherData);
+      tripData.weatherForecasts = processWeatherData(weatherData.weatherInfo);
+      console.log(tripData);
+    }).catch(function(error) {
+      console.log(`Error: ${error}`);
+      document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
+      return;
+    });
   }).catch(function(error) {
     console.log(`Error: ${error}`);
     document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
@@ -139,7 +234,11 @@ function generateTripData(submitEvent) {
 }
 
 export {
+  checkForBlankFields,
+  checkDateInput,
+  getDaysElapsed,
   getServerData,
+  processWeatherData,
   locationFound,
   generateTripData
 };

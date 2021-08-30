@@ -106,3 +106,15 @@ app.post('/geographicCoordinates', function(req, res) {
     res.json({message: 'An error occurred on the server while processing the data.'});
   });
 });
+
+app.post('/weatherForecast', function(req, res) {
+  const givenQuery = `&lat=${req.body.latitude}&lon=${req.body.longitude}`;
+  getAPIData(weatherbit_forecast_baseURL, givenQuery).then(function(weatherData) {
+    res.status = 200;
+    res.json({message: 'The weather data for the given coordinates has been retrieved.', weatherInfo: weatherData.data});
+  }).catch(function(error) {
+    console.log(`Error: ${error}`);
+    res.status = 500;
+    res.json({message: 'An error occurred on the server while processing the data.'});
+  });
+});

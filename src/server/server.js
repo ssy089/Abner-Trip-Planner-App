@@ -118,3 +118,112 @@ app.post('/weatherForecast', function(req, res) {
     res.json({message: 'An error occurred on the server while processing the data.'});
   });
 });
+
+app.post('/pixabayImages', function(req, res) {
+  let givenQuery = '';
+  if(req.body.id !== '') {
+    givenQuery = `&id=${req.body.imageID}`;
+    getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImage) {
+      const imageData = {
+        largeImageURL: retrievedImage.hits[0].largeImageURL,
+	userPage: retrievedImage.hits[0].user,
+	userID: retrievedImage.hits[0].user_id
+      };
+      res.status = 200;
+      res.json({message: 'The requested image was retrieved.', imageInfo: imageData});
+    }).catch(function(error) {
+      console.log(`Error: ${error}`);
+      res.status = 500;
+      res.json({message: 'An error occurred on the server while processing the data.'});
+    });
+  }
+  else {
+    givenQuery = `&q=${req.body.city},+${req.body.adminDiv},+${req.body.country}`;
+    getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages) {
+      if(retrievedImages.hits.length !== 0) {
+        if(retrievedImages.hits.length > 1) {
+	  res.status = 200;
+	  res.json({
+	    message: 'An image was found for the given location.', 
+	    imageID: retrievedImages.hits[1].id,
+	    foundLocation: req.body.city
+	  });
+	}
+	else {
+	  res.status = 200;
+	  res.json({
+	    message: 'An image was found for the given location.', 
+	    imageID: retrievedImages.hits[0].id,
+	    foundLocation: req.body.city
+	  });
+	}
+      }
+      else {
+        givenQuery = `&q=${req.body.city},+${req.body.adminDiv}`;
+        getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages) {
+          if(retrievedImages.hits.length !== 0) {
+            if(retrievedImages.hits.length > 1) {
+	      res.status = 200;
+	      res.json({
+	        message: 'An image was found for the given location.', 
+		imageID: retrievedImages.hits[1].id,
+		foundLocation: req.body.city
+	      });
+	    }
+	    else {
+	      res.status = 200;
+	      res.json({
+	        message: 'An image was found for the given location.', 
+		imageID: retrievedImages.hits[0].id,
+		foundLocation: req.body.city
+	      });
+	    }
+          }
+	  else {
+	    givenQuery = `&q=${req.body.country}`;
+	    getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages) {
+              if(retrievedImages.hits.length !== 0) {
+                if(retrievedImages.hits.length > 1) {
+	          res.status = 200;
+	          res.json({
+		    message: 'An image was found for the given location.', 
+		    imageID: retrievedImages.hits[1].id,
+		    foundLocation: req.body.country
+		  });
+	        }
+	        else {
+	          res.status = 200;
+	          res.json({
+		    message: 'An image was found for the given location.', 
+		    imageID: retrievedImages.hits[0].id,
+		    foundLocation: req.body.country
+		  });
+	        }
+              }
+	      else {
+	        res.status = 200;
+		res.json({
+		  message: 'An image could not be found for the given location.',
+		  imageID: null,
+		  foundLocation: null
+		});
+	      }
+	    }).catch(function(error) {
+	      console.log(error);
+	      res.status = 500;
+	      res.json({message: 'An error occurred on the server while processing the data.'});
+	    });
+	  }
+        }).catch(function(error) {
+	  console.log(error);
+	  res.status = 500;
+	  res.json({message: 'An error occurred on the server while processing the data.'});
+	});
+      }
+    }).catch(function(error) {
+      console.log(`Error: ${error}`);
+      res.status = 500;
+      res.json({message: 'An error occurred on the server while processing the data.'});
+    });
+  }
+});

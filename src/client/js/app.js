@@ -185,6 +185,10 @@ function generateTripData(submitEvent) {
     longitude: 0.0,
     startDate: '',
     endDate: '',
+    imageData: {
+      imageID: '',
+      imageLocation: ''
+    },
     activities: [],
     weatherForecasts: []
   };
@@ -220,7 +224,16 @@ function generateTripData(submitEvent) {
     getServerData({latitude: tripData.latitude, longitude: tripData.longitude}, 'weatherForecast').then(function(weatherData) {
       console.log(weatherData);
       tripData.weatherForecasts = processWeatherData(weatherData.weatherInfo);
-      console.log(tripData);
+      getServerData({id: '', city: tripData.city, adminDiv: tripData.administrativeDivision, country: tripData.country}, 'pixabayImages')
+      .then(function(imageResults) {
+        tripData.imageData.imageID = imageResults.imageID;
+	tripData.imageData.imageLocation = imageResults.foundLocation;
+	console.log(tripData);
+      }).catch(function(error) {
+        console.log(`Error: ${error}`);
+	document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
+        return;
+      });
     }).catch(function(error) {
       console.log(`Error: ${error}`);
       document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');

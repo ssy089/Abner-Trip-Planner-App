@@ -24,6 +24,70 @@ function checkDateInput(listOfInputs) {
   return validDateInput;
 }
 
+function displayPlannedActivities(givenTrip) {
+  return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+}
+
+function displayWeatherData(weatherForecasts) {
+  return '<div class="forecast-box"></div>';
+}
+
+function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
+  const tripSchedule = document.getElementById('trip-schedule-table');
+  const plannedActivities = document.getElementById('planned-activities-table');
+  const weatherDisplay = document.querySelector('.weather-display');
+  const locationImage = document.querySelector('img');
+  const imageCaption = document.querySelector('figcaption');
+ 
+  let tripTableRows = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry">Title</div><div class="custom-table-entry">City</div><div class="custom-table-entry">Admin. Division</div><div class="custom-table-entry">Country</div><div class="custom-table-entry">Start Date</div><div class="custom-table-entry">End Date</div></div>';
+
+  for(let someTrip of sortedListOfTrips) {
+    let tableRow = '<div class="custom-table-row data-row">';
+    let startDate = new Date(someTrip.startDate);
+    let endDate = new Date(someTrip.endDate);
+    tableRow += `<div class="custom-table-entry">${someTrip.title}</div>`;
+    tableRow += `<div class="custom-table-entry">${someTrip.city}</div>`;
+    tableRow += `<div class="custom-table-entry">${someTrip.administrativeDivision}</div>`;
+    tableRow += `<div class="custom-table-entry">${someTrip.country}</div>`;
+    tableRow += `<div class="custom-table-entry">${startDate.getMonth() + 1}\/${startDate.getDate()}\/${startDate.getFullYear()}</div>`;
+    tableRow += `<div class="custom-table-entry">${endDate.getMonth() + 1}\/${endDate.getDate()}\/${endDate.getFullYear()}</div>`;
+    tableRow += '</div>';
+    tripTableRows += tableRow;
+  }
+
+  const plannedActivitiesRows = displayPlannedActivities(selectedTrip.activities);
+  const weatherForecastDisplay = displayWeatherData(selectedTrip.weatherForecasts);
+
+  let selectedImage = '';
+  let attributionMessage = '';
+  if(selectedTrip.imageID === null) {
+    selectedImage = 'images/NoImageFound.png';
+    attributionMessage = 'Sorry, no images were found for this location.'
+  }
+  else {
+    selectedImage = temporaryImageURL;
+    attributionMessage = `Image by <cite><a target="_blank" href="https:\/\/pixabay.com\/users\/${selectedTrip.imageData.user}-${selectedTrip.imageData.userID}\/">${selectedTrip.imageData.user}</a></cite> from <cite><a target="_blank" href="https://pixabay.com/">Pixabay</a></cite>`;
+  }
+  
+  const tripTitleHeader = document.getElementById('trip-title-header');
+  const tripDestinationHeader = document.getElementById('trip-destination-header');
+  const tripDurationHeader = document.getElementById('trip-duration-header');
+  
+  const selectedTripStartDate = new Date(selectedTrip.startDate);
+  const selectedTripEndDate = new Date(selectedTrip.endDate);
+  const startDateString = `${selectedTripStartDate.getMonth() + 1}\/${selectedTripStartDate.getDate()}\/${selectedTripStartDate.getFullYear()}`;
+  const endDateString = `${selectedTripEndDate.getMonth() + 1}\/${selectedTripEndDate.getDate()}\/${selectedTripEndDate.getFullYear()}`;
+
+  tripTitleHeader.innerHTML = selectedTrip.title;
+  tripDestinationHeader.innerHTML = `${selectedTrip.city}, ${selectedTrip.administrativeDivision}, ${selectedTrip.country}`;
+  tripDurationHeader.innerHTML = `${startDateString} - ${endDateString}`;
+  tripSchedule.innerHTML = tripTableRows;
+  plannedActivities.innerHTML = plannedActivitiesRows;
+  weatherDisplay.innerHTML = weatherForecastDisplay;
+  locationImage.setAttribute('src', selectedImage);
+  imageCaption.innerHTML = attributionMessage;
+}
+
 function getDaysElapsed(startDate, endDate) {
   let elapsedTime = endDate.getTime() - startDate.getTime();
   elapsedTime /= 1000;
@@ -49,6 +113,73 @@ async function getServerData(givenData, givenRoute) {
   catch(error) {
     return error;
   }
+}
+
+function reverseMergeSortTrips(listOfTrips) {
+  return listOfTrips;
+  if(listOfTrips.length === 1) {
+    return listOfTrips;
+  }
+
+  const sizeOfFirstHalf = Math.floor(listOfTrips.length/2);
+  const sizeOfSecondHalf = sizeOfFirstHalf + 1;
+  const firstHalf = reverseMergeSortTrips(listOfTrips.slice(0, sizeOfFirstHalf));
+  const secondHalf = reverseMergeSortTrips(listOfTrips.slice(sizeOfFirstHalf));
+  const mergedArray = [];
+  let firstArrayIndex = 0;
+  let secondArrayIndex = 0;
+  while((firstArrayIndex < sizeOfFirstHalf) && (secondArrayIndex < sizeOfSecondHalf)) {
+    let firstEndDate = new Date(firstHalf[firstArrayIndex].endDate);
+    let secondEndDate = new Date(secondHalf[secondArrayIndex].endDate);
+    if(firstHalf[firstArrayIndex].countdown > secondHalf[secondArrayIndex].countdown) {
+      mergedArray.push(firstHalf[firstArrayIndex]);
+      firstArrayIndex++;
+    }
+    else if(firstHalf[firstArrayIndex].countdown < secondHalf[secondArrayIndex].countdown) {
+      mergedArray.push(secondHalf[secondArrayIndex]);
+      secondArrayIndex++;
+    }
+    else {
+      if(firstEndDate.getTime() > secondEndDate.getTime()) {
+        mergedArray.push(firstHalf[firstArrayIndex]);
+	firstArrayIndex++;
+      }
+      else if(firstEndDate.getTime() < secondEndDate.getTime()) {
+        mergedArray.push(secondHalf[secondArrayIndex]);
+	secondArrayIndex++;
+      }
+      else {
+        if(firstHalf[firstArrayIndex].title < secondHalf[secondArrayIndex].title) {
+	  mergedArray.push(firstHalf[firstArrayIndex]);
+	  firstArrayIndex++;
+	}
+	else if(firstHalf[firstArrayIndex].title > secondHalf[secondArrayIndex].title) {
+	  mergedArray.push(secondHalf[secondArrayIndex]);
+	  secondArrayIndex++;
+	}
+	else {
+	  mergedArray.push(firstHalf[firstArrayIndex]);
+	  mergedArray.push(secondHalf[secondArrayIndex]);
+	  firstArrayIndex++;
+	  secondArrayIndex++;
+	}
+      }
+    }
+  }
+  if(firstArrayIndex < sizeOfFirstHalf) {
+    while(firstArrayIndex < sizeOfFirstHalf) {
+      mergedArray.push(firstHalf[firstArrayIndex]);
+      firstArrayIndex++;
+    }
+  }
+  else if(secondArrayIndex < sizeOfSecondHalf) {
+    while(secondArrayIndex < sizeOfSecondHalf) {
+      mergedArray.push(secondHalf[secondArrayIndex]);
+      secondArrayIndex++;
+    }
+  }
+  console.log(firstHalf, secondHalf, mergedArray);
+  return mergedArray;
 }
 
 function processWeatherData(weatherInfo) {
@@ -139,6 +270,7 @@ function processWeatherData(weatherInfo) {
 }
 
 function locationFound(cityInput, adminDivInput, countryInput, serverResponseData) { 
+  console.log(serverResponseData);
   const errorAdvice = 'Make sure that the name is spelled correctly, that the correct punctuation marks are included, and that abbreviations are avoided. Also, make sure that the given location data is all correct.';
   const notFoundRegExp = /The given ([a-z]*\s*[a-z]+) was not found\./i;
   const serverMessage = serverResponseData.message;
@@ -179,15 +311,20 @@ function generateTripData(submitEvent) {
   const tripData = {
     title: '',
     city: '',
+    countdown: 0,
+    expired: false,
     administrativeDivision: '',
     country: '',
     latitude: 0.0,
     longitude: 0.0,
+    numberOfDays: 0,
     startDate: '',
     endDate: '',
     imageData: {
       imageID: '',
-      imageLocation: ''
+      imageLocation: '',
+      user: '',
+      userID: ''
     },
     activities: [],
     weatherForecasts: []
@@ -202,10 +339,24 @@ function generateTripData(submitEvent) {
   if(anyBlankFields) {
     return;
   }
+
+  tripData.title = tripTitleInput.value;
+
   const validDates = checkDateInput([startDateInput, endDateInput]);
   if(!validDates) {
     return;
   }
+  const startDateComponents = startDateInput.value.split('/');
+  const endDateComponents = endDateInput.value.split('/');
+  tripData.startDate = new Date(startDateComponents[2], `${parseInt(startDateComponents[0]) - 1}`, startDateComponents[1]);
+  tripData.endDate = new Date(endDateComponents[2], `${parseInt(endDateComponents[0]) - 1}`, startDateComponents[1]);
+  tripData.numberOfDays = getDaysElapsed(tripData.startDate, tripData.endDate);
+  const todayDate = new Date();
+  tripData.countdown = getDaysElapsed(todayDate, tripData.startDate);
+  if(getDaysElapsed(todayDate, tripData.endDate) <= 0) {
+    tripDate.expired = true;
+  }
+
   const givenInput = {
     city: cityInput.value,
     adminDiv: adminDivInput.value,
@@ -228,7 +379,16 @@ function generateTripData(submitEvent) {
       .then(function(imageResults) {
         tripData.imageData.imageID = imageResults.imageID;
 	tripData.imageData.imageLocation = imageResults.foundLocation;
-	console.log(tripData);
+	tripData.imageData.user = imageResults.user;
+	tripData.imageData.userID = imageResults.userID;
+	getServerData({someTrip: tripData}, 'listOfTrips').then(function(serverData) {
+	  const sortedTrips = reverseMergeSortTrips(serverData.tripList);
+	  displayTripData(sortedTrips, tripData, imageResults.largeImageURL);
+	}).catch(function(error) {
+	  console.log(`Error: ${error}`);
+          document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
+          return;
+	});
       }).catch(function(error) {
         console.log(`Error: ${error}`);
 	document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
@@ -249,9 +409,13 @@ function generateTripData(submitEvent) {
 export {
   checkForBlankFields,
   checkDateInput,
+  displayPlannedActivities,
+  displayTripData,
+  displayWeatherData,
   getDaysElapsed,
   getServerData,
   processWeatherData,
   locationFound,
-  generateTripData
+  generateTripData,
+  reverseMergeSortTrips
 };

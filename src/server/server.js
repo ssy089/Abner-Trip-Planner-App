@@ -18,6 +18,9 @@ const pixabayBaseURL = `https:\/\/pixabay.com\/api\/?key=${PIXABAY_API_KEY}&safe
 const weatherbit_current_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/current?key=${WEATHERBIT_API_KEY}`;
 const weatherbit_forecast_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/forecast\/daily?key=${WEATHERBIT_API_KEY}`;
 
+const listOfTrips = [];
+let currentlySelectedTrip = {};
+
 /* Create an application instance and set the middleware. */
 const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
@@ -107,6 +110,13 @@ app.post('/geographicCoordinates', function(req, res) {
   });
 });
 
+app.post('/listOfTrips', function(req, res) {
+  listOfTrips.push(req.body.someTrip);
+  currentlySelectedTrips = req.body.someTrip;
+  res.status = 200;
+  res.json({tripList: listOfTrips});
+});
+
 app.post('/weatherForecast', function(req, res) {
   const givenQuery = `&lat=${req.body.latitude}&lon=${req.body.longitude}`;
   getAPIData(weatherbit_forecast_baseURL, givenQuery).then(function(weatherData) {
@@ -124,11 +134,7 @@ app.post('/pixabayImages', function(req, res) {
   if(req.body.id !== '') {
     givenQuery = `&id=${req.body.imageID}`;
     getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImage) {
-      const imageData = {
-        largeImageURL: retrievedImage.hits[0].largeImageURL,
-	userPage: retrievedImage.hits[0].user,
-	userID: retrievedImage.hits[0].user_id
-      };
+      const imageData = {largeImageURL: retrievedImage.hits[0].largeImageURL};
       res.status = 200;
       res.json({message: 'The requested image was retrieved.', imageInfo: imageData});
     }).catch(function(error) {
@@ -146,7 +152,10 @@ app.post('/pixabayImages', function(req, res) {
 	  res.json({
 	    message: 'An image was found for the given location.', 
 	    imageID: retrievedImages.hits[1].id,
-	    foundLocation: req.body.city
+	    foundLocation: req.body.city,
+            largeImageURL: retrievedImages.hits[0].largeImageURL,
+	    user: retrievedImages.hits[0].user,
+	    userID: retrievedImages.hits[0].user_id
 	  });
 	}
 	else {
@@ -154,7 +163,10 @@ app.post('/pixabayImages', function(req, res) {
 	  res.json({
 	    message: 'An image was found for the given location.', 
 	    imageID: retrievedImages.hits[0].id,
-	    foundLocation: req.body.city
+	    foundLocation: req.body.city,
+            largeImageURL: retrievedImages.hits[0].largeImageURL,
+	    user: retrievedImages.hits[0].user,
+	    userID: retrievedImages.hits[0].user_id
 	  });
 	}
       }
@@ -167,7 +179,10 @@ app.post('/pixabayImages', function(req, res) {
 	      res.json({
 	        message: 'An image was found for the given location.', 
 		imageID: retrievedImages.hits[1].id,
-		foundLocation: req.body.city
+		foundLocation: req.body.city,
+                largeImageURL: retrievedImages.hits[0].largeImageURL,
+	        user: retrievedImages.hits[0].user,
+	        userID: retrievedImages.hits[0].user_id
 	      });
 	    }
 	    else {
@@ -175,7 +190,10 @@ app.post('/pixabayImages', function(req, res) {
 	      res.json({
 	        message: 'An image was found for the given location.', 
 		imageID: retrievedImages.hits[0].id,
-		foundLocation: req.body.city
+		foundLocation: req.body.city,
+                largeImageURL: retrievedImages.hits[0].largeImageURL,
+	        user: retrievedImages.hits[0].user,
+	        userID: retrievedImages.hits[0].user_id
 	      });
 	    }
           }
@@ -188,7 +206,10 @@ app.post('/pixabayImages', function(req, res) {
 	          res.json({
 		    message: 'An image was found for the given location.', 
 		    imageID: retrievedImages.hits[1].id,
-		    foundLocation: req.body.country
+		    foundLocation: req.body.country,
+                    largeImageURL: retrievedImages.hits[0].largeImageURL,
+	            user: retrievedImages.hits[0].user,
+	            userID: retrievedImages.hits[0].user_id
 		  });
 	        }
 	        else {
@@ -196,7 +217,10 @@ app.post('/pixabayImages', function(req, res) {
 	          res.json({
 		    message: 'An image was found for the given location.', 
 		    imageID: retrievedImages.hits[0].id,
-		    foundLocation: req.body.country
+		    foundLocation: req.body.country,
+                    largeImageURL: retrievedImages.hits[0].largeImageURL,
+	            user: retrievedImages.hits[0].user,
+	            userID: retrievedImages.hits[0].user_id
 		  });
 	        }
               }
@@ -205,7 +229,10 @@ app.post('/pixabayImages', function(req, res) {
 		res.json({
 		  message: 'An image could not be found for the given location.',
 		  imageID: null,
-		  foundLocation: null
+		  foundLocation: null,
+                  largeImageURL: null,
+	          user: null,
+	          userID: null
 		});
 	      }
 	    }).catch(function(error) {

@@ -19,7 +19,18 @@ function checkDateInput(listOfInputs) {
       givenInput.insertAdjacentHTML('afterend', '<p class="error">Please provide the date in the specified format.</p>');
       validDateInput = false;
     }
-    dateMatch = null;
+    else {
+      let dateNumbers = givenInput.value.split('/');
+      let calculatedDate = new Date(dateNumbers[2], `${parseInt(dateNumbers[0]) - 1}`, dateNumbers[1]);
+      let calculatedDateNumbers = [`${parseInt(calculatedDate.getMonth()) + 1}`, calculatedDate.getDate(), calculatedDate.getFullYear()];
+      for(let i = 0; i < 3; i++) {
+	if(parseInt(dateNumbers[i]) !== parseInt(calculatedDateNumbers[i])) {
+          givenInput.insertAdjacentHTML('afterend', '<p class="error">The given date does not exist.</p>');
+	  validDateInput = false;
+	  return validDateInput;
+        }
+      }
+    }
   }
   return validDateInput;
 }
@@ -60,7 +71,7 @@ function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
 
   let selectedImage = '';
   let attributionMessage = '';
-  if(selectedTrip.imageID === null) {
+  if(selectedTrip.imageData.imageID === null) {
     selectedImage = 'images/NoImageFound.png';
     attributionMessage = 'Sorry, no images were found for this location.'
   }
@@ -94,7 +105,7 @@ function getDaysElapsed(startDate, endDate) {
   elapsedTime /= 60;
   elapsedTime /= 60;
   elapsedTime /= 24;
-  return parseInt(elapsedTime, 10);
+  return Math.ceil(elapsedTime);
 }
 
 async function getServerData(givenData, givenRoute) {
@@ -116,13 +127,12 @@ async function getServerData(givenData, givenRoute) {
 }
 
 function reverseMergeSortTrips(listOfTrips) {
-  return listOfTrips;
   if(listOfTrips.length === 1) {
     return listOfTrips;
   }
 
   const sizeOfFirstHalf = Math.floor(listOfTrips.length/2);
-  const sizeOfSecondHalf = sizeOfFirstHalf + 1;
+  const sizeOfSecondHalf = listOfTrips.length - sizeOfFirstHalf;
   const firstHalf = reverseMergeSortTrips(listOfTrips.slice(0, sizeOfFirstHalf));
   const secondHalf = reverseMergeSortTrips(listOfTrips.slice(sizeOfFirstHalf));
   const mergedArray = [];
@@ -131,20 +141,20 @@ function reverseMergeSortTrips(listOfTrips) {
   while((firstArrayIndex < sizeOfFirstHalf) && (secondArrayIndex < sizeOfSecondHalf)) {
     let firstEndDate = new Date(firstHalf[firstArrayIndex].endDate);
     let secondEndDate = new Date(secondHalf[secondArrayIndex].endDate);
-    if(firstHalf[firstArrayIndex].countdown > secondHalf[secondArrayIndex].countdown) {
+    if(firstHalf[firstArrayIndex].countdown < secondHalf[secondArrayIndex].countdown) {
       mergedArray.push(firstHalf[firstArrayIndex]);
       firstArrayIndex++;
     }
-    else if(firstHalf[firstArrayIndex].countdown < secondHalf[secondArrayIndex].countdown) {
+    else if(firstHalf[firstArrayIndex].countdown > secondHalf[secondArrayIndex].countdown) {
       mergedArray.push(secondHalf[secondArrayIndex]);
       secondArrayIndex++;
     }
     else {
-      if(firstEndDate.getTime() > secondEndDate.getTime()) {
+      if(firstEndDate.getTime() < secondEndDate.getTime()) {
         mergedArray.push(firstHalf[firstArrayIndex]);
 	firstArrayIndex++;
       }
-      else if(firstEndDate.getTime() < secondEndDate.getTime()) {
+      else if(firstEndDate.getTime() > secondEndDate.getTime()) {
         mergedArray.push(secondHalf[secondArrayIndex]);
 	secondArrayIndex++;
       }
@@ -269,9 +279,8 @@ function processWeatherData(weatherInfo) {
   return allWeatherForecasts;
 }
 
-function locationFound(cityInput, adminDivInput, countryInput, serverResponseData) { 
-  console.log(serverResponseData);
-  const errorAdvice = 'Make sure that the name is spelled correctly, that the correct punctuation marks are included, and that abbreviations are avoided. Also, make sure that the given location data is all correct.';
+function locationFound(cityInput, adminDivInput, countryInput, serverResponseData) {
+  const errorAdvice = 'Make sure that the name is spelled correctly, that the correct punctuation marks are included, and that abbreviations are avoided. Also, make sure that the three location inputs all correspond to an actual location.';
   const notFoundRegExp = /The given ([a-z]*\s*[a-z]+) was not found\./i;
   const serverMessage = serverResponseData.message;
   const notFoundMatch = serverMessage.match(notFoundRegExp);
@@ -292,9 +301,19 @@ function locationFound(cityInput, adminDivInput, countryInput, serverResponseDat
       case 'country':
 	elementId = 'country';
 	break;
+      case 'location':
+        elementId  = null;
     }
-    document.getElementById(elementId).insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}</p>`);
-    return false;
+    if(elementId === null) {
+      document.getElementById('city').insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}</p>`);
+      document.getElementById('admin-div').insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}</p>`);
+      document.getElementById('country').insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}</p>`);
+      return false;
+    }
+    else {
+      document.getElementById(elementId).insertAdjacentHTML('afterend', `<p class="error">${serverMessage} ${errorAdvice}</p>`);
+      return false;
+    }
   }
   return true;
 }
@@ -349,7 +368,7 @@ function generateTripData(submitEvent) {
   const startDateComponents = startDateInput.value.split('/');
   const endDateComponents = endDateInput.value.split('/');
   tripData.startDate = new Date(startDateComponents[2], `${parseInt(startDateComponents[0]) - 1}`, startDateComponents[1]);
-  tripData.endDate = new Date(endDateComponents[2], `${parseInt(endDateComponents[0]) - 1}`, startDateComponents[1]);
+  tripData.endDate = new Date(endDateComponents[2], `${parseInt(endDateComponents[0]) - 1}`, endDateComponents[1]);
   tripData.numberOfDays = getDaysElapsed(tripData.startDate, tripData.endDate);
   const todayDate = new Date();
   tripData.countdown = getDaysElapsed(todayDate, tripData.startDate);
@@ -373,7 +392,6 @@ function generateTripData(submitEvent) {
     tripData.latitude = data.locationInfo.latitude;
     tripData.longitude = data.locationInfo.longitude;
     getServerData({latitude: tripData.latitude, longitude: tripData.longitude}, 'weatherForecast').then(function(weatherData) {
-      console.log(weatherData);
       tripData.weatherForecasts = processWeatherData(weatherData.weatherInfo);
       getServerData({id: '', city: tripData.city, adminDiv: tripData.administrativeDivision, country: tripData.country}, 'pixabayImages')
       .then(function(imageResults) {
@@ -383,6 +401,7 @@ function generateTripData(submitEvent) {
 	tripData.imageData.userID = imageResults.userID;
 	getServerData({someTrip: tripData}, 'listOfTrips').then(function(serverData) {
 	  const sortedTrips = reverseMergeSortTrips(serverData.tripList);
+	  console.log(sortedTrips);
 	  displayTripData(sortedTrips, tripData, imageResults.largeImageURL);
 	}).catch(function(error) {
 	  console.log(`Error: ${error}`);

@@ -69,6 +69,12 @@ textarea:hover {
 }
 
 @media(max-width: 600px) {
+  form {
+    h3 {
+      align-self: center;
+    }
+  }
+  
   textarea {
     height: 150px;
     width: 190px;

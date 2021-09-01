@@ -38,13 +38,24 @@ section:nth-of-type(even) {
   border: thin solid #ff7f50;
   display: flex;
   flex-direction: column;
+  min-height: 104px;
   height: min-content;
+  max-height: 181px;
+  overflow: auto;
   width: min-content;
+}
+
+.custom-table::-webkit-scrollbar-button {
+  background-color: #ff7f50;
+  border-radius: 0.5em;
+  color: #fff;
+  height: 2px;
+  width: 2px;;
 }
 
 .custom-table-entry {
   border: thin solid #ff7f50;
-  height: 25px;
+  height: 75px;
   text-align: center;
   width: 150px;
 }
@@ -53,6 +64,10 @@ section:nth-of-type(even) {
   display: flex;
   flex-direction: row;
   text-decoration: underline;
+
+  .custom-table-entry {
+    height: 25px;
+  }
 }
 
 .custom-table-row { 
@@ -72,10 +87,34 @@ section:nth-of-type(even) {
   width: 200px;
 }
 
+.trip-display {
+  h3,
+  h4,
+  h5 {
+    text-align: center;
+  }
+}
+
 .weather-display {
   background-color: #fff;
   height: min-content;
   width: 200px;
+}
+
+#planned-activities-table {
+  min-height: 179px;
+  max-height: 331px;
+  
+  .custom-table-entry {
+    height: 150px;
+    width: 190px;
+  }
+
+  .custom-table-headers {
+    .custom-table-entry {
+      height: 25px;
+    }
+  }
 }
 
 @media(max-width: 600px) {
@@ -96,23 +135,46 @@ section:nth-of-type(even) {
 
   .custom-table {
     flex-direction: row;
+    max-height: min-content;
+    min-height: min-content;
+    max-width: 244px;
+    min-width: 244px;
   }
 
   .custom-table-entry {
-    height: 75px;
-    width: 100px;
+    height: 110px;
+    width: 120px;
   }
 
   .custom-table-headers {
     flex-direction: column;
+    
+    .custom-table-entry {
+      height: 110px;
+    }
   }
 
   .custom-table-row {
     flex-direction: column;
   }
 
-  .description-box {
-    height: 240px;
+  #planned-activities-table {
+    min-height: min-content;
+    max-height: min-content;
+    min-width: 204px;
+    max-width: 204px;
+    
+    .custom-table-entry {
+      height: 240px;
+      width: 100px;
+    }
+
+    .custom-table-headers {
+      .custom-table-entry {
+        height: 240px;
+	width: 100px;
+      }
+    }
   }
 }
 
@@ -124,18 +186,38 @@ section:nth-of-type(even) {
 
   .custom-table {
     flex-direction: row;
+    max-height: min-content;
+    min-height: min-content;
+    max-width: 456px;
+    min-width: 304px;
   }
 
-  .custom-table-entry {
-    height: 25px;
-    width: 150px;
+  .custom-table-headers {
+    .custom-table-entry {
+      height: 75px;
+    }
   }
 
   .custom-table-row {
     flex-direction: column;
   }
 
-  .description-box {
-    height: 190px;
+  #planned-activities-table {
+    min-height: min-content;
+    max-height: min-content;
+    min-width: 304px;
+    max-width: 456px;
+    
+    .custom-table-entry {
+      height: 195px;
+      width: 150px;
+    }
+
+    .custom-table-headers {
+      .custom-table-entry {
+        height: 195px;
+	width: 150px;
+      }
+    }
   }
 }

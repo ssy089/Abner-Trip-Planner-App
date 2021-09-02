@@ -158,129 +158,113 @@ app.post('/pixabayImages', function(req, res) {
     });
   }
   else {
-    const photoTypes = ['buildings', 'places', 'nature'];
-    let anImageWasFound = false;
-    for(let photoType of photoTypes) {
-      givenQuery = `&category=${photoType}`;
-      givenQuery += `&q=${req.body.city},+${req.body.adminDiv},+${req.body.country}`;
-      getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages) {
-        if(retrievedImages.hits.length !== 0) {
-	  anImageWasFound = true;
-          if(retrievedImages.hits.length > 1) {
-	    res.status = 200;
-	    res.json({
-	      message: 'An image was found for the given location.', 
-	      imageID: retrievedImages.hits[1].id,
-	      foundLocation: req.body.city,
-              largeImageURL: retrievedImages.hits[0].largeImageURL,
-	      user: retrievedImages.hits[0].user,
-	      userID: retrievedImages.hits[0].user_id
-	    });
-	  }
+    const photoType = req.body.photoType;
+    const city = req.body.city;
+    const adminDiv = req.body.adminDiv;
+    const country = req.body.country;
+    givenQuery = `&category=${photoType}&q=${city},+${adminDiv},+${country}`;
+    getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages1) {
+      givenQuery = `&category=${photoType}&q=${city},+${adminDiv}`;
+      getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages2) {
+        givenQuery = `&category=${photoType}&q=${country}`;
+        getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages3) {
+	  if(retrievedImages1.hits.length !== 0) {
+            if(retrievedImages1.hits.length > 1) {
+              res.status = 200;
+              res.json({
+                message: 'An image was found for the given location.', 
+                imageID: retrievedImages1.hits[1].id,
+                foundLocation: `${city}, ${adminDiv}, ${country}`,
+                largeImageURL: retrievedImages1.hits[0].largeImageURL,
+                user: retrievedImages1.hits[0].user,
+                userID: retrievedImages1.hits[0].user_id
+              });
+            }
+            else {
+              res.status = 200;
+              res.json({
+                message: 'An image was found for the given location.',
+                imageID: retrievedImages1.hits[0].id,
+                foundLocation: `${city}, ${adminDiv}, ${country}`,
+                largeImageURL: retrievedImages1.hits[0].largeImageURL,
+                user: retrievedImages1.hits[0].user,
+                userID: retrievedImages1.hits[0].user_id
+              });
+            }
+          }
+          else if(retrievedImages2.hits.length !== 0) {
+            if(retrievedImages2.hits.length > 1) {
+              res.status = 200;
+              res.json({
+                message: 'An image was found for the given location.', 
+                imageID: retrievedImages2.hits[1].id,
+                foundLocation: `${city}, ${adminDiv}, ${country}`,
+                largeImageURL: retrievedImages2.hits[0].largeImageURL,
+                user: retrievedImages2.hits[0].user,
+                userID: retrievedImages2.hits[0].user_id
+              });
+            }
+            else {
+              res.status = 200;
+              res.json({
+                message: 'An image was found for the given location.',
+                imageID: retrievedImages2.hits[0].id,
+                foundLocation: `${city}, ${adminDiv}, ${country}`,
+                largeImageURL: retrievedImages2.hits[0].largeImageURL,
+                user: retrievedImages2.hits[0].user,
+                userID: retrievedImages2.hits[0].user_id
+              });
+            }
+          }
+	  else if(retrievedImages3.hits.length !== 0) {
+            if(retrievedImages3.hits.length > 1) {
+              res.status = 200;
+              res.json({
+                message: 'An image was found for the given location.', 
+                imageID: retrievedImages3.hits[1].id,
+                foundLocation: country,
+                largeImageURL: retrievedImages3.hits[0].largeImageURL,
+                user: retrievedImages3.hits[0].user,
+                userID: retrievedImages3.hits[0].user_id
+              });
+            }
+            else {
+              res.status = 200;
+              res.json({
+                message: 'An image was found for the given location.',
+                imageID: retrievedImages3.hits[0].id,
+                foundLocation: country,
+                largeImageURL: retrievedImages3.hits[0].largeImageURL,
+                user: retrievedImages3.hits[0].user,
+                userID: retrievedImages3.hits[0].user_id
+              });
+            }
+          }
 	  else {
 	    res.status = 200;
-	    res.json({
-	      message: 'An image was found for the given location.', 
-	      imageID: retrievedImages.hits[0].id,
-	      foundLocation: req.body.city,
-              largeImageURL: retrievedImages.hits[0].largeImageURL,
-	      user: retrievedImages.hits[0].user,
-	      userID: retrievedImages.hits[0].user_id
-	    });
-	  }
-	  return;
-        }
-        else {
-          givenQuery = `&category=${photoType}`;
-	  givenQuery += `&q=${req.body.city},+${req.body.adminDiv}`;
-          getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages) {
-	    if(retrievedImages.hits.length !== 0) {
-	      anImageWasFound = true;
-              if(retrievedImages.hits.length > 1) {
-	        res.status = 200;
-	        res.json({
-	          message: 'An image was found for the given location.', 
-		  imageID: retrievedImages.hits[1].id,
-		  foundLocation: req.body.city,
-                  largeImageURL: retrievedImages.hits[0].largeImageURL,
-	          user: retrievedImages.hits[0].user,
-	          userID: retrievedImages.hits[0].user_id
-	        });
-	      }
-	      else {
-	        res.status = 200;
-	        res.json({
-	          message: 'An image was found for the given location.', 
-		  imageID: retrievedImages.hits[0].id,
-		  foundLocation: req.body.city,
-                  largeImageURL: retrievedImages.hits[0].largeImageURL,
-	          user: retrievedImages.hits[0].user,
-	          userID: retrievedImages.hits[0].user_id
-	        });
-	      }
-	      return;
-            }
-	    else {
-	      givenQuery = `&category=${photoType}`;
-	      givenQuery += `&q=${req.body.country}`;
-	      getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages) {
-                if(retrievedImages.hits.length !== 0) {
-		  anImageWasFound = true;
-                  if(retrievedImages.hits.length > 1) {
-	            res.status = 200;
-	            res.json({
-		      message: 'An image was found for the given location.', 
-		      imageID: retrievedImages.hits[1].id,
-		      foundLocation: req.body.country,
-                      largeImageURL: retrievedImages.hits[0].largeImageURL,
-	              user: retrievedImages.hits[0].user,
-	              userID: retrievedImages.hits[0].user_id
-		    });
-	          }
-	          else {
-	            res.status = 200;
-	            res.json({
-		      message: 'An image was found for the given location.', 
-		      imageID: retrievedImages.hits[0].id,
-		      foundLocation: req.body.country,
-                      largeImageURL: retrievedImages.hits[0].largeImageURL,
-	              user: retrievedImages.hits[0].user,
-	              userID: retrievedImages.hits[0].user_id
-		    });
-	          }
-		  return;
-                }
-	      }).catch(function(error) {
-	        console.log(error);
-	        res.status = 500;
-	        res.json({message: 'An error occurred on the server while processing the data.'});
-	      });
-	    }
-          }).catch(function(error) {
-	    console.log(error);
-	    res.status = 500;
-	    res.json({message: 'An error occurred on the server while processing the data.'});
-	  });
-        }
+            res.json({
+              message: 'An image could not be found for the given location.',
+              imageID: null,
+              foundLocation: null,
+              largeImageURL: null,
+              user: null,
+              userID: null
+            });
+          }
+	}).catch(function(error) {
+	  console.log(`Error Name: ${error.name}, Error Message: ${error.message}`);
+          res.status = 500;
+          res.json({message: 'An error occurred on the server while processing the data.'});
+        });
       }).catch(function(error) {
-        console.log(`Error: ${error}`);
+        console.log(`Error Name: ${error.name}, Error Message: ${error.message}`);
         res.status = 500;
         res.json({message: 'An error occurred on the server while processing the data.'});
       });
-      if(anImageWasFound) {
-        break;
-      }
-    }
-    if(!anImageWasFound) {
-      res.status = 200;
-      res.json({
-        message: 'An image could not be found for the given location.',
-        imageID: null,
-        foundLocation: null,
-        largeImageURL: null,
-        user: null,
-        userID: null
-      });
-    }
+    }).catch(function(error) {
+      console.log(`Error Name: ${error.name}, Error Message: ${error.message}`);
+      res.status = 500;
+      res.json({message: 'An error occurred on the server while processing the data.'});
+    });     
   }
 });

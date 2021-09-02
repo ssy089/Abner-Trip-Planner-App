@@ -77,7 +77,7 @@ function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
   }
   else {
     selectedImage = temporaryImageURL;
-    attributionMessage = `Image by <cite><a target="_blank" href="https:\/\/pixabay.com\/users\/${selectedTrip.imageData.user}-${selectedTrip.imageData.userID}\/">${selectedTrip.imageData.user}</a></cite> from <cite><a target="_blank" href="https://pixabay.com/">Pixabay</a></cite>`;
+    attributionMessage = `${selectedTrip.imageData.imageLocation}. Image by <cite><a target="_blank" href="https:\/\/pixabay.com\/users\/${selectedTrip.imageData.user}-${selectedTrip.imageData.userID}\/">${selectedTrip.imageData.user}</a></cite> from <cite><a target="_blank" href="https://pixabay.com/">Pixabay</a></cite>`;
   }
   
   const tripTitleHeader = document.getElementById('trip-title-header');
@@ -97,6 +97,35 @@ function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
   weatherDisplay.innerHTML = weatherForecastDisplay;
   locationImage.setAttribute('src', selectedImage);
   imageCaption.innerHTML = attributionMessage;
+}
+
+async function findLocationPhotograph(imageData) {
+  const imageQuery = {
+    id: imageData.id, 
+    city: imageData.city, 
+    adminDiv: imageData.adminDiv, 
+    country: imageData.country,
+    photoType: ''
+  };
+  const photoCategories = ['buildings', 'places', 'nature'];
+  let serverResponse = null;
+  for(let photoCategory of photoCategories) {
+    imageQuery.photoType = photoCategory;
+    serverResponse = await getServerData(imageQuery, 'pixabayImages');
+
+    try {
+      if(serverResponse.imageID === null) {
+        continue;
+      }
+      else {
+        return Promise.resolve(serverResponse);
+      }
+    }
+    catch(error) {
+      return error;
+    }
+  }
+  return Promise.resolve(serverResponse);
 }
 
 function getDaysElapsed(startDate, endDate) {
@@ -393,9 +422,10 @@ function generateTripData(submitEvent) {
     tripData.longitude = data.locationInfo.longitude;
     getServerData({latitude: tripData.latitude, longitude: tripData.longitude}, 'weatherForecast').then(function(weatherData) {
       tripData.weatherForecasts = processWeatherData(weatherData.weatherInfo);
-      getServerData({id: '', city: tripData.city, adminDiv: tripData.administrativeDivision, country: tripData.country}, 'pixabayImages')
+      findLocationPhotograph({id: '', city: tripData.city, adminDiv: tripData.administrativeDivision, country: tripData.country})
       .then(function(imageResults) {
-        tripData.imageData.imageID = imageResults.imageID;
+        console.log(imageResults);
+	tripData.imageData.imageID = imageResults.imageID;
 	tripData.imageData.imageLocation = imageResults.foundLocation;
 	tripData.imageData.user = imageResults.user;
 	tripData.imageData.userID = imageResults.userID;

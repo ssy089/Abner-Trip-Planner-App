@@ -424,14 +424,12 @@ function generateTripData(submitEvent) {
       tripData.weatherForecasts = processWeatherData(weatherData.weatherInfo);
       findLocationPhotograph({id: '', city: tripData.city, adminDiv: tripData.administrativeDivision, country: tripData.country})
       .then(function(imageResults) {
-        console.log(imageResults);
 	tripData.imageData.imageID = imageResults.imageID;
 	tripData.imageData.imageLocation = imageResults.foundLocation;
 	tripData.imageData.user = imageResults.user;
 	tripData.imageData.userID = imageResults.userID;
 	getServerData({someTrip: tripData}, 'listOfTrips').then(function(serverData) {
 	  const sortedTrips = reverseMergeSortTrips(serverData.tripList);
-	  console.log(sortedTrips);
 	  displayTripData(sortedTrips, tripData, imageResults.largeImageURL);
 	}).catch(function(error) {
 	  console.log(`Error: ${error}`);

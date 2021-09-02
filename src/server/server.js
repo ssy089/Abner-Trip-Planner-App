@@ -39,7 +39,7 @@ async function getAPIData(givenBaseURL, givenQuery) {
   const apiResponse = await fetch(givenBaseURL + givenQuery);
 
   try {
-    responseData = await apiResponse.json();
+    const responseData = await apiResponse.json();
     return responseData;
   }
   catch(error) {
@@ -162,11 +162,11 @@ app.post('/pixabayImages', function(req, res) {
     const city = req.body.city;
     const adminDiv = req.body.adminDiv;
     const country = req.body.country;
-    givenQuery = `&category=${photoType}&q=${city},+${adminDiv},+${country}`;
+    givenQuery = `&category=${photoType}&q=${city},${adminDiv},${country}`.normalize("NFD").replace(/\p{Diacritic}/gu, "");
     getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages1) {
-      givenQuery = `&category=${photoType}&q=${city},+${adminDiv}`;
+      givenQuery = `&category=${photoType}&q=${city},${adminDiv}`.normalize("NFD").replace(/\p{Diacritic}/gu, "");
       getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages2) {
-        givenQuery = `&category=${photoType}&q=${country}`;
+        givenQuery = `&category=${photoType}&q=${country}`.normalize("NFD").replace(/\p{Diacritic}/gu, "");
         getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImages3) {
 	  if(retrievedImages1.hits.length !== 0) {
             if(retrievedImages1.hits.length > 1) {

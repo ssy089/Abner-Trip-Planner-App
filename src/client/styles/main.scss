@@ -45,14 +45,6 @@ section:nth-of-type(even) {
   width: min-content;
 }
 
-.custom-table::-webkit-scrollbar-button {
-  background-color: #ff7f50;
-  border-radius: 0.5em;
-  color: #fff;
-  height: 2px;
-  width: 2px;;
-}
-
 .custom-table-entry {
   border: thin solid #ff7f50;
   height: 75px;
@@ -85,6 +77,10 @@ section:nth-of-type(even) {
   background-color: #add8e6;
   height: 200px;
   width: 200px;
+}
+
+.selected-data-row {
+  background-color: #add8e6;
 }
 
 .trip-display {

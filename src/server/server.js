@@ -131,7 +131,7 @@ function tripsIterativeMergeSort(tripList) {
   let subArraySize = 0;
   let leftArrayStart = 0;
 
-  for(subArraySize = 0; subArraySize <= (n-1); subArraySize *= 2) {
+  for(subArraySize = 1; subArraySize <= (n-1); subArraySize *= 2) {
     for(leftArrayStart = 0; leftArrayStart < (n - 1); leftArrayStart += 2*subArraySize) {
       midPoint = Math.min(leftArrayStart + subArraySize - 1, n - 1);
       rightArrayEnd = Math.min(leftArrayStart + 2*subArraySize - 1, n - 1);
@@ -141,7 +141,7 @@ function tripsIterativeMergeSort(tripList) {
   return mergedArray;
 }
 
-function mergeTripArrays(unsortedArray, leftArrayStart, midPoint, rightArrayEnd) {
+function mergeTripArrays(mergedArray, leftArrayStart, midPoint, rightArrayEnd) {
   let i = 0;
   let j = 0;
   let k = 0;
@@ -152,55 +152,55 @@ function mergeTripArrays(unsortedArray, leftArrayStart, midPoint, rightArrayEnd)
   let rightArray = [];
 
   for(i = 0; i < firstArraySize; i++) {
-    leftArray[i] = unsortedArray[leftArrayStart + i];
+    leftArray[i] = mergedArray[leftArrayStart + i];
   }
   for(j = 0; j < secondArraySize; j++) {
-    rightArray = unsortedArray[midPoint + 1 + j];
+    rightArray[j] = mergedArray[midPoint + 1 + j];
   }
 
   i = 0;
   j = 0;
-  k = 1;
+  k = leftArrayStart;
   while((i < firstArraySize) && (j < secondArraySize)) {
     let firstEndDate = new Date(leftArray[i].endDate);
     let secondEndDate = new Date(rightArray[j].endDate);
     if(leftArray[i].countdown < rightArray[j].countdown) {
-      unsortedArray[k] = leftArray[i];
+      mergedArray[k] = leftArray[i];
       i++;
       k++;
     }
     else if(leftArray[i].countdown > rightArray[j].countdown) {
-      unsortedArray[k] = rightArray[j];
+      mergedArray[k] = rightArray[j];
       j++;
       k++;
     }
     else {
-      if(firstEndDate.getTime() < rightArray[j].getTime()) {
-        unsortedArray[k] = leftArray[i];
+      if(firstEndDate.getTime() < secondEndDate.getTime()) {
+        mergedArray[k] = leftArray[i];
         i++;
 	k++;
       }
-      else if(firstEndDate.getTime() > rightArray[j].getTime()) {
-        unsortedArray[k] = rightArray[j];
+      else if(firstEndDate.getTime() > secondEndDate.getTime()) {
+        mergedArray[k] = rightArray[j];
 	j++;
 	k++;
       }
       else {
         if(leftArray[i].title < rightArray[j].title) {
-	  unsortedArray[k] = leftArray[i];
+	  mergedArray[k] = leftArray[i];
 	  i++;
 	  k++;
 	}
 	else if(leftArray[i].title > rightArray[j].title) {
-	  unsortedArray[k] = rightArray[j];
+	  mergedArray[k] = rightArray[j];
 	  j++;
 	  k++;
 	}
 	else {
-	  unsortedArray[k] = leftArray[i];
+	  mergedArray[k] = leftArray[i];
 	  i++;
 	  k++;
-	  unsortedArray[k] = rightArray[j];
+	  mergedArray[k] = rightArray[j];
 	  j++;
 	  k++;
 	}
@@ -209,18 +209,18 @@ function mergeTripArrays(unsortedArray, leftArrayStart, midPoint, rightArrayEnd)
   }
 
   while(i < firstArraySize) {
-    unsortedArray[k] = leftArray[i];
+    mergedArray[k] = leftArray[i];
     i++;
     k++;
   }
 
   while(j < secondArraySize) {
-    unsortedArray[k] = rightArray[j];
+    mergedArray[k] = rightArray[j];
     j++;
     k++;
   }
 
-  return unsortedArray;
+  return mergedArray;
 }
 
 app.post('/listOfTrips', function(req, res) {

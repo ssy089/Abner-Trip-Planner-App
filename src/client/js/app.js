@@ -155,72 +155,6 @@ async function getServerData(givenData, givenRoute) {
   }
 }
 
-function reverseMergeSortTrips(listOfTrips) {
-  if(listOfTrips.length === 1) {
-    return listOfTrips;
-  }
-
-  const sizeOfFirstHalf = Math.floor(listOfTrips.length/2);
-  const sizeOfSecondHalf = listOfTrips.length - sizeOfFirstHalf;
-  const firstHalf = reverseMergeSortTrips(listOfTrips.slice(0, sizeOfFirstHalf));
-  const secondHalf = reverseMergeSortTrips(listOfTrips.slice(sizeOfFirstHalf));
-  const mergedArray = [];
-  let firstArrayIndex = 0;
-  let secondArrayIndex = 0;
-  while((firstArrayIndex < sizeOfFirstHalf) && (secondArrayIndex < sizeOfSecondHalf)) {
-    let firstEndDate = new Date(firstHalf[firstArrayIndex].endDate);
-    let secondEndDate = new Date(secondHalf[secondArrayIndex].endDate);
-    if(firstHalf[firstArrayIndex].countdown < secondHalf[secondArrayIndex].countdown) {
-      mergedArray.push(firstHalf[firstArrayIndex]);
-      firstArrayIndex++;
-    }
-    else if(firstHalf[firstArrayIndex].countdown > secondHalf[secondArrayIndex].countdown) {
-      mergedArray.push(secondHalf[secondArrayIndex]);
-      secondArrayIndex++;
-    }
-    else {
-      if(firstEndDate.getTime() < secondEndDate.getTime()) {
-        mergedArray.push(firstHalf[firstArrayIndex]);
-	firstArrayIndex++;
-      }
-      else if(firstEndDate.getTime() > secondEndDate.getTime()) {
-        mergedArray.push(secondHalf[secondArrayIndex]);
-	secondArrayIndex++;
-      }
-      else {
-        if(firstHalf[firstArrayIndex].title < secondHalf[secondArrayIndex].title) {
-	  mergedArray.push(firstHalf[firstArrayIndex]);
-	  firstArrayIndex++;
-	}
-	else if(firstHalf[firstArrayIndex].title > secondHalf[secondArrayIndex].title) {
-	  mergedArray.push(secondHalf[secondArrayIndex]);
-	  secondArrayIndex++;
-	}
-	else {
-	  mergedArray.push(firstHalf[firstArrayIndex]);
-	  mergedArray.push(secondHalf[secondArrayIndex]);
-	  firstArrayIndex++;
-	  secondArrayIndex++;
-	}
-      }
-    }
-  }
-  if(firstArrayIndex < sizeOfFirstHalf) {
-    while(firstArrayIndex < sizeOfFirstHalf) {
-      mergedArray.push(firstHalf[firstArrayIndex]);
-      firstArrayIndex++;
-    }
-  }
-  else if(secondArrayIndex < sizeOfSecondHalf) {
-    while(secondArrayIndex < sizeOfSecondHalf) {
-      mergedArray.push(secondHalf[secondArrayIndex]);
-      secondArrayIndex++;
-    }
-  }
-  console.log(firstHalf, secondHalf, mergedArray);
-  return mergedArray;
-}
-
 function processWeatherData(weatherInfo) {
   const allWeatherForecasts = [];
   for(let weatherForecast of weatherInfo) {
@@ -402,7 +336,7 @@ function generateTripData(submitEvent) {
   const todayDate = new Date();
   tripData.countdown = getDaysElapsed(todayDate, tripData.startDate);
   if(getDaysElapsed(todayDate, tripData.endDate) <= 0) {
-    tripDate.expired = true;
+    tripData.expired = true;
   }
 
   const givenInput = {
@@ -429,7 +363,8 @@ function generateTripData(submitEvent) {
 	tripData.imageData.user = imageResults.user;
 	tripData.imageData.userID = imageResults.userID;
 	getServerData({someTrip: tripData}, 'listOfTrips').then(function(serverData) {
-	  const sortedTrips = reverseMergeSortTrips(serverData.tripList);
+	  const sortedTrips = serverData.tripList;
+	  console.log(sortedTrips);
 	  displayTripData(sortedTrips, tripData, imageResults.largeImageURL);
 	}).catch(function(error) {
 	  console.log(`Error: ${error}`);
@@ -464,5 +399,5 @@ export {
   processWeatherData,
   locationFound,
   generateTripData,
-  reverseMergeSortTrips
+  findLocationPhotograph
 };

@@ -18,7 +18,7 @@ const pixabayBaseURL = `https:\/\/pixabay.com\/api\/?key=${PIXABAY_API_KEY}&safe
 const weatherbit_current_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/current?key=${WEATHERBIT_API_KEY}`;
 const weatherbit_forecast_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/forecast\/daily?key=${WEATHERBIT_API_KEY}`;
 
-const listOfTrips = [];
+let listOfTrips = [];
 let currentlySelectedTrip = {};
 
 /* Create an application instance and set the middleware. */
@@ -124,9 +124,111 @@ app.post('/geographicCoordinates', function(req, res) {
   });
 });
 
+function tripsIterativeMergeSort(tripList) {
+  let n = tripList.length;
+  let mergedArray = tripList;
+
+  let subArraySize = 0;
+  let leftArrayStart = 0;
+
+  for(subArraySize = 0; subArraySize <= (n-1); subArraySize *= 2) {
+    for(leftArrayStart = 0; leftArrayStart < (n - 1); leftArrayStart += 2*subArraySize) {
+      midPoint = Math.min(leftArrayStart + subArraySize - 1, n - 1);
+      rightArrayEnd = Math.min(leftArrayStart + 2*subArraySize - 1, n - 1);
+      mergedArray = mergeTripArrays(mergedArray, leftArrayStart, midPoint, rightArrayEnd);
+    }
+  }
+  return mergedArray;
+}
+
+function mergeTripArrays(unsortedArray, leftArrayStart, midPoint, rightArrayEnd) {
+  let i = 0;
+  let j = 0;
+  let k = 0;
+  let firstArraySize = midPoint - leftArrayStart + 1
+  let secondArraySize = rightArrayEnd - midPoint;
+
+  let leftArray = [];
+  let rightArray = [];
+
+  for(i = 0; i < firstArraySize; i++) {
+    leftArray[i] = unsortedArray[leftArrayStart + i];
+  }
+  for(j = 0; j < secondArraySize; j++) {
+    rightArray = unsortedArray[midPoint + 1 + j];
+  }
+
+  i = 0;
+  j = 0;
+  k = 1;
+  while((i < firstArraySize) && (j < secondArraySize)) {
+    let firstEndDate = new Date(leftArray[i].endDate);
+    let secondEndDate = new Date(rightArray[j].endDate);
+    if(leftArray[i].countdown < rightArray[j].countdown) {
+      unsortedArray[k] = leftArray[i];
+      i++;
+      k++;
+    }
+    else if(leftArray[i].countdown > rightArray[j].countdown) {
+      unsortedArray[k] = rightArray[j];
+      j++;
+      k++;
+    }
+    else {
+      if(firstEndDate.getTime() < rightArray[j].getTime()) {
+        unsortedArray[k] = leftArray[i];
+        i++;
+	k++;
+      }
+      else if(firstEndDate.getTime() > rightArray[j].getTime()) {
+        unsortedArray[k] = rightArray[j];
+	j++;
+	k++;
+      }
+      else {
+        if(leftArray[i].title < rightArray[j].title) {
+	  unsortedArray[k] = leftArray[i];
+	  i++;
+	  k++;
+	}
+	else if(leftArray[i].title > rightArray[j].title) {
+	  unsortedArray[k] = rightArray[j];
+	  j++;
+	  k++;
+	}
+	else {
+	  unsortedArray[k] = leftArray[i];
+	  i++;
+	  k++;
+	  unsortedArray[k] = rightArray[j];
+	  j++;
+	  k++;
+	}
+      }
+    }
+  }
+
+  while(i < firstArraySize) {
+    unsortedArray[k] = leftArray[i];
+    i++;
+    k++;
+  }
+
+  while(j < secondArraySize) {
+    unsortedArray[k] = rightArray[j];
+    j++;
+    k++;
+  }
+
+  return unsortedArray;
+}
+
 app.post('/listOfTrips', function(req, res) {
-  listOfTrips.push(req.body.someTrip);
-  currentlySelectedTrips = req.body.someTrip;
+  if(req.body.someTrip !== null) {
+    listOfTrips.push(req.body.someTrip);
+  }
+  listOfTrips = tripsIterativeMergeSort(listOfTrips);
+  currentlySelectedTrip = req.body.someTrip;
   res.status = 200;
   res.json({tripList: listOfTrips});
 });

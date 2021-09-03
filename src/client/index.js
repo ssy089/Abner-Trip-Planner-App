@@ -8,7 +8,7 @@ import { getServerData } from './js/app';
 import { processWeatherData } from './js/app';
 import { locationFound } from './js/app';
 import { generateTripData } from './js/app';
-import { reverseMergeSortTrips } from './js/app';
+import { findLocationPhotograph } from './js/app';
 import regeneratorRuntime from 'regenerator-runtime'; //This module is used to provide a runtime for async functions.
 
 import './styles/base.scss';
@@ -48,6 +48,6 @@ export {
   processWeatherData,
   locationFound,
   generateTripData,
-  reverseMergeSortTrips,
+  findLocationPhotograph,
   regeneratorRuntime
 };

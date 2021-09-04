@@ -19,7 +19,7 @@ const weatherbit_current_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/current?ke
 const weatherbit_forecast_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/forecast\/daily?key=${WEATHERBIT_API_KEY}`;
 
 let listOfTrips = [];
-let currentlySelectedTrip = {};
+let currentlySelectedTrip = null;
 
 /* Create an application instance and set the middleware. */
 const app = express();
@@ -46,6 +46,40 @@ async function getAPIData(givenBaseURL, givenQuery) {
     return error;
   }
 }
+
+app.delete('/tripActivities', function(req, res) {
+  const selectedData = req.body.selectedData;
+  if(selectedData === 'all') {
+    listOfTrips = [];
+  }
+  else {
+    const activities = currentlySelectedTrip.activities;
+    let i = 0;
+    let j = 0;
+    for(i = 0; i < selectedData.length; i++) {
+      for(j = 0; j < activities.length; j++) {
+        if((selectedData[i].description === activities[j].description) && ((selectedData[i].setTime == activities[j].setTime) && (selectedData[i].setDate && activities[j].setDate))) {
+	  activities.splice(j, 1);
+	  break;
+	}
+      }
+    }
+  }
+  res.status = 200;
+  res.json({message: 'The data was deleted.'});
+});
+
+app.post('/tripActivities', function(req, res) {
+  if(currentlySelectedTrip === null) {
+    res.status = 200;
+    res.json({message: 'There is no trip that is currently displayed.'});
+  }
+  else {
+    currentlySelectedTrip.activities.push(req.body.givenActivity);
+    res.status = 200;
+    res.json({message: "The activities list was updated", listOfActivities: currentlySelectedTrip.activities});
+  }
+});
 
 app.post('/geographicCoordinates', function(req, res) {
   const cityComponents = req.body.city.split(/ +/);
@@ -122,6 +156,28 @@ app.post('/geographicCoordinates', function(req, res) {
     res.status = 500;
     res.json({message: 'An error occurred on the server while processing the data.'});
   });
+});
+
+app.delete('/listOfTrips', function(req, res) {
+  const tripsToDelete = req.body.deleteTrips;
+  if(tripsToDelete === 'all') {
+    listOfTrips = [];
+    currentlySelectedTrip = null;
+  }
+  else {
+    let i = 0;
+    let j = 0;
+    for(i = 0; i < tripsToDelete.length; i++) {
+      for(j = 0; j < listOfTrips.length; j++) {
+        if(((tripToDelete[i].title === listOfTrips[j].title) && (tripsToDelete[i].city === listOfTrips[j].city)) && ((tripsToDelete[i].startDate === listOfTrips[j].startDate) && (tripsToDelete[i].endDate === listOfTrips[j].endDate))) {
+	  listOfTrips.splice(j, 1);
+	  break;
+	}
+      }
+    }
+  }
+  res.status = 200;
+  res.json({message: 'The data was deleted'});
 });
 
 function tripsIterativeMergeSort(tripList) {

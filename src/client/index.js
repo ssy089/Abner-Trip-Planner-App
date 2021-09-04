@@ -1,5 +1,8 @@
+import { addActivity} from './js/app';
 import { checkForBlankFields } from './js/app';
 import { checkDateInput } from './js/app';
+import { deleteActivityData } from './js/app';
+import { deleteAPIData } from './js/app';
 import { displayPlannedActivities } from './js/app';
 import { displayTripData } from './js/app';
 import { displayWeatherData } from './js/app';
@@ -35,11 +38,27 @@ import './media/icon_c02d.png';
 import './media/icon_c03d.png';
 import './media/icon_c04d.png';
 
+function selectRow(rowSelected) {
+  const classes = rowSelected.target.parentElement.classList;
+  for(let someClass of classes) {
+    if(someClass === 'data-row') {
+      rowSelected.target.parentElement.classList.toggle('selected-data-row');
+    }
+  }
+}
+
 document.getElementById('schedule-trip').addEventListener('click', generateTripData);
+document.getElementById('trip-schedule-table').addEventListener('click', selectRow);
+document.getElementById('planned-activities-table').addEventListener('click', selectRow);
+document.getElmentById('activity-info-buttons').addEventListener('click', deleteActivityData);
+document.getElementById('add-activity').addEventListener('click', addActivity);
 
 export {
+  addActivity,
   checkForBlankFields,
   checkDateInput,
+  deleteActivityData,
+  deleteAPIData,
   displayPlannedActivities,
   displayTripData,
   displayWeatherData,

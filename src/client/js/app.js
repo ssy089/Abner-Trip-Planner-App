@@ -1,3 +1,36 @@
+function addActivity(submitEvent) {
+  submitEvent.preventDefault();
+
+  const descriptionBox = document.getElmentById('activity-description');
+  const givenTime = document.getElementById('activity-time');
+  const givenDate = document.getElementById('activity-date');
+
+  const anyBlankFields = checkForBlankFields([descriptionBox, givenTime, givenDate]);
+
+  const dateRegExp = new RegExp('[1-12]:[0-5][0-9] (AM|PM)', 'i');
+  if(givenTime.value.match(dateRegExp) === null) {
+    const errorText = '<p class="error">Please enter the time in the specified format (e.g. 1:00 PM). Make sure to remove leading zeros, and make sure that there is one space between the numbers and the AM/PM option.</p>';
+    givenTime.insertAdjacentHTML('afterend', errorText);
+  }
+  const validDate = checkDateInput([givenDate]);
+  if(!validDate) {
+    return;
+  }
+  const newActivity = {
+    description: descriptionBox.value,
+    setTime: givenTime.value,
+    setDate: givenDate.value
+  };
+  getAPIData({givenActivity: newActivity}, 'tripActivities').then(function(data) {
+    if(data.message === 'There is no trip that is currently displayed.') {
+      document.submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">Select and display a trip in order to add activities for the trip.');
+    }
+    else {
+      displayPlannedActivities(data.listOfActivities);
+    }
+  }).catch();
+}
+
 function checkForBlankFields(listOfInputs) {
   let blankFields = false;
   for(let givenInput of listOfInputs) {
@@ -35,8 +68,71 @@ function checkDateInput(listOfInputs) {
   return validDateInput;
 }
 
-function displayPlannedActivities(givenTrip) {
-  return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+async function deleteAPIData(givenRequest, givenRoute) {
+  const serverResponse = await fetch('http://localhost:8081/' + givenRoute, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(givenData)
+  });
+
+  try {
+    const responseData = await serverResponse.json();
+    return responseData;
+  }
+  catch(error) {
+    return error;
+  }
+}
+
+function deleteActivityData(deleteInfo) {
+  deleteInfo.preventDefault();
+  if(deleteInfo.target.id === 'clear-activities') {
+    document.getElementById('planned-activities-table').innerHTML = '<div class="custom-table-headers custom-table-row"><div class="description-box custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="data-row custom-table-row"><div class="description-box custom-table-entry"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+    deleteAPIData({selectedData: 'all'}, 'trip-activities').then(function(data) {}).catch(function(error) {
+      console.log(`Error: ${error}`);
+      document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
+    });
+  }
+  else if(deleteInfo.target.id === 'cancel-activity') {
+    const canceledActivities = document.getElementById('planned-activities-table').getElementsByClassName('selected-data-row');
+    const canceledData = [];
+    for(let canceledActivity of canceledActivities) {
+      let activityData = canceledActivity.children;
+      let givenDescription = activityData[0].value;
+      let givenTime = activityDate[1].value;
+      let givenDate = activity[2].value;
+      let someActivity = {
+        description: givenDescription,
+	setDate: givenDate,
+	setTime: givenTime
+      };
+      canceledData.push(someActivity);
+      canceledActivity.remove();
+    }
+    deleteAPIData({selectedData: canceledData}, 'tripActivities').then(function(data) {}).catch(function(error) {
+      console.log(`Error: ${error}`);
+      document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
+    });
+  }
+}
+
+function displayPlannedActivities(activitiesList) {
+  if(activitiesList.length === 0) {
+    return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+  }
+
+  const activitiesHTML = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div>';
+  const activities = activitiesList;
+  for(activity of activities) {
+    activitiesHTML += '<div class="data-row custom-table-row">';
+    activitiesHTML += `<div class="description-box custom-table-entry">${activity.description}</div>`;
+    activitiesHTML += `<div class="custom-table-entry">${activity.setTime}</div>`;
+    activitiesHTML += `<div class="custom-table-entry">${activity.setDate}</div>`;
+    activitiesHTML += '</div>';
+  }
+  return activitiesHTML;
 }
 
 function displayWeatherData(weatherForecasts) {
@@ -389,8 +485,11 @@ function generateTripData(submitEvent) {
 }
 
 export {
+  addActivity,
   checkForBlankFields,
   checkDateInput,
+  deleteActivityData,
+  deleteAPIData,
   displayPlannedActivities,
   displayTripData,
   displayWeatherData,

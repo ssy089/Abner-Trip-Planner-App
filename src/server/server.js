@@ -20,6 +20,7 @@ const weatherbit_forecast_baseURL = `http:\/\/api.weatherbit.io\/v2.0\/forecast\
 
 let listOfTrips = [];
 let currentlySelectedTrip = null;
+let currentlySelectedIndex = null;
 
 /* Create an application instance and set the middleware. */
 const app = express();
@@ -49,24 +50,30 @@ async function getAPIData(givenBaseURL, givenQuery) {
 
 app.delete('/tripActivities', function(req, res) {
   const selectedData = req.body.selectedData;
-  if(selectedData === 'all') {
-    listOfTrips = [];
+  if(currentlySelectedTrip === null) {
+    res.status = 200;
+    res.json({message: 'There is no trip that is currently displayed.'});
   }
   else {
-    const activities = currentlySelectedTrip.activities;
-    let i = 0;
-    let j = 0;
-    for(i = 0; i < selectedData.length; i++) {
-      for(j = 0; j < activities.length; j++) {
-        if((selectedData[i].description === activities[j].description) && ((selectedData[i].setTime == activities[j].setTime) && (selectedData[i].setDate && activities[j].setDate))) {
-	  activities.splice(j, 1);
-	  break;
-	}
+    if(selectedData === 'all') {
+      currentlySelectedTrip.activities = [];
+    }
+    else {
+      const activities = currentlySelectedTrip.activities;
+      let i = 0;
+      let j = 0;
+      for(i = 0; i < selectedData.length; i++) {
+        for(j = 0; j < activities.length; j++) {
+          if((selectedData[i].description === activities[j].description) && ((selectedData[i].setTime == activities[j].setTime) && (selectedData[i].setDate && activities[j].setDate))) {
+	    activities.splice(j, 1);
+	    break;
+	  }
+        }
       }
     }
+    res.status = 200;
+    res.json({message: 'The data was deleted.'});
   }
-  res.status = 200;
-  res.json({message: 'The data was deleted.'});
 });
 
 app.post('/tripActivities', function(req, res) {
@@ -169,8 +176,14 @@ app.delete('/listOfTrips', function(req, res) {
     let j = 0;
     for(i = 0; i < tripsToDelete.length; i++) {
       for(j = 0; j < listOfTrips.length; j++) {
-        if(((tripToDelete[i].title === listOfTrips[j].title) && (tripsToDelete[i].city === listOfTrips[j].city)) && ((tripsToDelete[i].startDate === listOfTrips[j].startDate) && (tripsToDelete[i].endDate === listOfTrips[j].endDate))) {
-	  listOfTrips.splice(j, 1);
+        if(((tripsToDelete[i].title === listOfTrips[j].title) && (tripsToDelete[i].city === listOfTrips[j].city)) && ((tripsToDelete[i].startDate === listOfTrips[j].startDate) && (tripsToDelete[i].endDate === listOfTrips[j].endDate))) {
+	  if(currentlySelectedTrip !== null) {
+	    if(((currentlySelectedTrip.title === listOfTrips[j].title) && (currentlySelectedTrip.city === listOfTrips[j].city)) && ((currentlySelectedTrip.startDate === listOfTrips[j].startDate) && (currentlySelectedTrip.endDate === listOfTrips[j].endDate))) {
+	      currentlySelectedTrip = null;
+	      currentlySelectedIndex = null;
+	    }
+	  }
+	  listOfTrips.splice(j, 1); 
 	  break;
 	}
       }
@@ -280,13 +293,26 @@ function mergeTripArrays(mergedArray, leftArrayStart, midPoint, rightArrayEnd) {
 }
 
 app.post('/listOfTrips', function(req, res) {
-  if(req.body.someTrip !== null) {
-    listOfTrips.push(req.body.someTrip);
+  if(req.body.someTrip !== null) { 
+    currentlySelectedTrip = req.body.someTrip;
+    if(req.body.method === 'insert') { 
+      listOfTrips.push(req.body.someTrip);
+      listOfTrips = tripsIterativeMergeSort(listOfTrips);
+    }
+    for(let i = 0; i < listOfTrips.length; i++) {
+      if(((currentlySelectedTrip.title === listOfTrips[i].title) && (currentlySelectedTrip.city === listOfTrips[i].city)) && ((currentlySelectedTrip.startDate === listOfTrips[i].startDate) && (currentlySelectedTrip.endDate === listOfTrips[i].endDate))) {
+        currentlySelectedIndex = i;
+	currentlySelectedTrip = listOfTrips[i];
+	break;
+      }
+    }
+    res.status = 200;
+    res.json({tripList: listOfTrips, selectedTrip: currentlySelectedTrip});
   }
-  listOfTrips = tripsIterativeMergeSort(listOfTrips);
-  currentlySelectedTrip = req.body.someTrip;
-  res.status = 200;
-  res.json({tripList: listOfTrips});
+  else {
+    res.status = 200;
+    res.json({tripList: listOfTrips});
+  }
 });
 
 app.post('/weatherForecast', function(req, res) {
@@ -304,11 +330,11 @@ app.post('/weatherForecast', function(req, res) {
 app.post('/pixabayImages', function(req, res) {
   let givenQuery = '';
   if(req.body.id !== '') {
-    givenQuery = `&id=${req.body.imageID}`;
+    givenQuery = `&id=${req.body.id}`;
     getAPIData(pixabayBaseURL, givenQuery).then(function(retrievedImage) {
       const imageData = {largeImageURL: retrievedImage.hits[0].largeImageURL};
       res.status = 200;
-      res.json({message: 'The requested image was retrieved.', imageInfo: imageData});
+      res.json({message: 'The requested image was retrieved.', imageInfo: imageData, imageID: req.body.id});
     }).catch(function(error) {
       console.log(`Error: ${error}`);
       res.status = 500;
@@ -333,9 +359,9 @@ app.post('/pixabayImages', function(req, res) {
                 message: 'An image was found for the given location.', 
                 imageID: retrievedImages1.hits[1].id,
                 foundLocation: `${city}, ${adminDiv}, ${country}`,
-                largeImageURL: retrievedImages1.hits[0].largeImageURL,
-                user: retrievedImages1.hits[0].user,
-                userID: retrievedImages1.hits[0].user_id
+                largeImageURL: retrievedImages1.hits[1].largeImageURL,
+                user: retrievedImages1.hits[1].user,
+                userID: retrievedImages1.hits[1].user_id
               });
             }
             else {
@@ -357,9 +383,9 @@ app.post('/pixabayImages', function(req, res) {
                 message: 'An image was found for the given location.', 
                 imageID: retrievedImages2.hits[1].id,
                 foundLocation: `${city}, ${adminDiv}, ${country}`,
-                largeImageURL: retrievedImages2.hits[0].largeImageURL,
-                user: retrievedImages2.hits[0].user,
-                userID: retrievedImages2.hits[0].user_id
+                largeImageURL: retrievedImages2.hits[1].largeImageURL,
+                user: retrievedImages2.hits[1].user,
+                userID: retrievedImages2.hits[1].user_id
               });
             }
             else {
@@ -381,9 +407,9 @@ app.post('/pixabayImages', function(req, res) {
                 message: 'An image was found for the given location.', 
                 imageID: retrievedImages3.hits[1].id,
                 foundLocation: country,
-                largeImageURL: retrievedImages3.hits[0].largeImageURL,
-                user: retrievedImages3.hits[0].user,
-                userID: retrievedImages3.hits[0].user_id
+                largeImageURL: retrievedImages3.hits[1].largeImageURL,
+                user: retrievedImages3.hits[1].user,
+                userID: retrievedImages3.hits[1].user_id
               });
             }
             else {

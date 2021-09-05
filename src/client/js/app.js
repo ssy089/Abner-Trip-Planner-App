@@ -1,34 +1,137 @@
+function accessTripData(clickEvent) {
+  clickEvent.preventDefault();
+  
+  const tripButtons = document.getElementById('trip-info-access');
+
+  const accessErrorMessages = tripButtons.getElementsByClassName('error');
+  for(let errorMessage of accessErrorMessages) {
+    errorMessage.remove();
+  }
+  
+  if(clickEvent.target.id === 'cancel-all') {
+    document.getElementById('trip-schedule-table').innerHTML = '<div class="custom-table-headers custom-table-row"><div class="custom-table-entry">Title</div><div class="custom-table-entry">City</div><div class="custom-table-entry">Admin. Division</div><div class="custom-table-entry">Country</div><div class="custom-table-entry">Start Date</div><div class="custom-table-entry">End Date</div></div>';
+    deleteServerData({deleteTrips: 'all'}, 'listOfTrips').then(function(data) {}).catch(function(error) {
+      console.log(`Error: ${error}`);
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
+    });
+  }
+  else if(clickEvent.target.id === 'cancel-trip') {
+    const canceledTrips = document.getElementById('trip-schedule-table').getElementsByClassName('selected-data-row');
+    if(canceledTrips.length === 0) {
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">One or more rows must be selected in order to delete trip data.</p>');
+      return;
+    }
+    const canceledData = [];
+    for(let canceledTrip of canceledTrips) {
+      let tripData = canceledTrip.children;
+      let givenTitle = tripData[0].textContent;
+      let givenCity = tripData[1].textContent;
+      let givenStartDateComponents = tripData[4].textContent.split('/'); 
+      let givenStartDate = new Date(givenStartDateComponents[2], `${parseInt(givenStartDateComponents[0]) - 1}`, givenStartDateComponents[1]);
+      let givenEndDateComponents = tripData[5].textContent.split('/');
+      let givenEndDate = new Date(givenEndDateComponents[2], `${parseInt(givenEndDateComponents[0]) - 1}`, givenEndDateComponents[1]);
+      let someTrip = {
+        title: givenTitle,
+	city: givenCity,
+	startDate: givenStartDate,
+	endDate: givenEndDate
+      };
+      canceledData.push(someTrip);
+      canceledTrip.remove();
+    }
+    deleteServerData({deleteTrips: canceledData}, 'listOfTrips').then(function(data) {}).catch(function(error) {
+      console.log(`Error: ${error}`);
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
+    });
+  }
+  else if(clickEvent.target.id === 'display-info') {
+    const selectedTripRow = document.getElementById('trip-schedule-table').querySelector('.selected-data-row');
+    if(selectedTripRow === null) {
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">A row must be selected in order to display its information.</p>');
+      return;
+    }
+    const selectedTripData = selectedTripRow.children;
+    let givenStartDateComponents = selectedTripData[4].textContent.split('/'); 
+    let givenStartDate = new Date(givenStartDateComponents[2], `${parseInt(givenStartDateComponents[0]) - 1}`, givenStartDateComponents[1]);
+    let givenEndDateComponents = selectedTripData[5].textContent.split('/');
+    let givenEndDate = new Date(givenEndDateComponents[2], `${parseInt(givenEndDateComponents[0]) - 1}`, givenEndDateComponents[1]);
+    const tripData = {
+      title: selectedTripData[0].textContent,
+      city: selectedTripData[1].textContent,
+      startDate: givenStartDate,
+      endDate: givenEndDate
+    };
+    getServerData({someTrip: tripData, method: 'retrieve'}, 'listOfTrips').then(function(data) {
+      console.log(data);
+      const imageQuery = {
+        id: data.selectedTrip.imageData.imageID,
+	city: data.selectedTrip.city,
+	adminDiv: data.selectedTrip.administrativeDivision,
+	country: data.selectedTrip.country
+      };
+      findLocationPhotograph(imageQuery).then(function(imageRetrieved) {
+	displaySelectedTrip(data.selectedTrip, imageRetrieved.imageInfo.largeImageURL);
+      }).catch(function(error) {
+        console.log(`Error: ${error}`);
+        document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The image for the selected data could not be retrieved.');
+      });
+    }).catch(function(error) {
+      console.log(`Error: ${error}`);
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be retrieved from the server.');
+    });
+  }
+}
+
 function addActivity(submitEvent) {
   submitEvent.preventDefault();
 
-  const descriptionBox = document.getElmentById('activity-description');
+  const activityErrors = document.querySelector('.activity-planner').querySelectorAll('.error');
+  for(let activityError of activityErrors) {
+    activityError.remove();
+  }
+
+  const descriptionBox = document.getElementById('activity-description');
   const givenTime = document.getElementById('activity-time');
   const givenDate = document.getElementById('activity-date');
 
   const anyBlankFields = checkForBlankFields([descriptionBox, givenTime, givenDate]);
+  if(anyBlankFields) {
+    return;
+  }
 
-  const dateRegExp = new RegExp('[1-12]:[0-5][0-9] (AM|PM)', 'i');
+  const dateRegExp = new RegExp('[0-1]*[0-9]:[0-5][0-9] (AM|PM)', 'i');
   if(givenTime.value.match(dateRegExp) === null) {
     const errorText = '<p class="error">Please enter the time in the specified format (e.g. 1:00 PM). Make sure to remove leading zeros, and make sure that there is one space between the numbers and the AM/PM option.</p>';
     givenTime.insertAdjacentHTML('afterend', errorText);
+    return;
   }
   const validDate = checkDateInput([givenDate]);
   if(!validDate) {
     return;
   }
+  
+  if(descriptionBox.value.length > 250) {
+    descriptionBox.insertAdjacentHTML('afterend', '<p class="error">Please enter 250 characters or less.</p>');
+    return;
+  }
+
   const newActivity = {
     description: descriptionBox.value,
     setTime: givenTime.value,
     setDate: givenDate.value
   };
-  getAPIData({givenActivity: newActivity}, 'tripActivities').then(function(data) {
+  getServerData({givenActivity: newActivity}, 'tripActivities').then(function(data) {
     if(data.message === 'There is no trip that is currently displayed.') {
       document.submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">Select and display a trip in order to add activities for the trip.');
     }
     else {
-      displayPlannedActivities(data.listOfActivities);
+      const activityRows = displayPlannedActivities(data.listOfActivities);
+      document.getElementById('planned-activities-table').innerHTML = activityRows;
     }
-  }).catch();
+  }).catch(function(error) {
+    console.log(`Error: ${error}`);
+    submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
+  });
 }
 
 function checkForBlankFields(listOfInputs) {
@@ -68,7 +171,7 @@ function checkDateInput(listOfInputs) {
   return validDateInput;
 }
 
-async function deleteAPIData(givenRequest, givenRoute) {
+async function deleteServerData(givenData, givenRoute) {
   const serverResponse = await fetch('http://localhost:8081/' + givenRoute, {
     method: 'DELETE',
     headers: {
@@ -88,34 +191,77 @@ async function deleteAPIData(givenRequest, givenRoute) {
 
 function deleteActivityData(deleteInfo) {
   deleteInfo.preventDefault();
-  if(deleteInfo.target.id === 'clear-activities') {
-    document.getElementById('planned-activities-table').innerHTML = '<div class="custom-table-headers custom-table-row"><div class="description-box custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="data-row custom-table-row"><div class="description-box custom-table-entry"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
-    deleteAPIData({selectedData: 'all'}, 'trip-activities').then(function(data) {}).catch(function(error) {
+  
+  const activityErrorMessages = document.querySelector('.activity-planner').querySelectorAll('.error');
+  for(let activityErrorMessage of activityErrorMessages) {
+    activityErrorMessage.remove();
+  }
+  
+  if(deleteInfo.target.id === 'clear-activities') { 
+    deleteServerData({selectedData: 'all'}, 'tripActivities').then(function(data) {
+      if(data.message === 'There is no trip that is currently displayed.') {
+        document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Select a trip in order to cancel activities.</p>');
+      }
+      else {
+        document.getElementById('planned-activities-table').innerHTML = '<div class="custom-table-headers custom-table-row"><div class="description-box custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="data-row custom-table-row"><div class="description-box custom-table-entry"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+      }
+    }).catch(function(error) {
       console.log(`Error: ${error}`);
       document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
     });
   }
-  else if(deleteInfo.target.id === 'cancel-activity') {
+  else if(deleteInfo.target.id === 'cancel-activity') { 
     const canceledActivities = document.getElementById('planned-activities-table').getElementsByClassName('selected-data-row');
     const canceledData = [];
     for(let canceledActivity of canceledActivities) {
       let activityData = canceledActivity.children;
-      let givenDescription = activityData[0].value;
-      let givenTime = activityDate[1].value;
-      let givenDate = activity[2].value;
+      let givenDescription = activityData[0].textContent;
+      let givenTime = activityData[1].textContent;
+      let givenDate = activityData[2].textContent;
       let someActivity = {
         description: givenDescription,
 	setDate: givenDate,
 	setTime: givenTime
       };
       canceledData.push(someActivity);
-      canceledActivity.remove();
     }
-    deleteAPIData({selectedData: canceledData}, 'tripActivities').then(function(data) {}).catch(function(error) {
+    deleteServerData({selectedData: canceledData}, 'tripActivities').then(function(data) {
+      if(data.message === 'There is no trip that is currently displayed.') {
+        document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Select a trip in order to cancel activities.</p>');
+      }
+      else {
+        for(let canceledActivity of canceledActivities) {
+          canceledActivity.remove();
+        }
+      }
+    }).catch(function(error) {
       console.log(`Error: ${error}`);
       document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
     });
   }
+}
+
+function displayImageData(selectedTrip, temporaryImageURL) {
+  const imageDisplayData = {
+    url: '',
+    attributionMessage: ''
+  };
+
+  if(selectedTrip === null) {
+    imageDisplayData.url = 'images/globe-3411506_1920.jpg';
+    imageDisplayData.attributionMessage = 'Image by <cite><a target="_blank" href="https://pixabay.com/users/kreatikar-8562930/">Mudassar Iqbal</a></cite> from <cite><a target="_blank" href="https://pixabay.com/">Pixabay</a></cite>';
+    return imageDisplayData;
+  }
+  
+  if(selectedTrip.imageData.imageID === null) {
+    imageDisplayData.url = 'images/NoImageFound.png';
+    imageDisplayData.attributionMessage = 'Sorry, no images were found for this location.'
+  }
+  else {
+    imageDisplayData.url = temporaryImageURL;
+    imageDisplayData.attributionMessage = `${selectedTrip.imageData.imageLocation}. Image by <cite><a target="_blank" href="https:\/\/pixabay.com\/users\/${selectedTrip.imageData.user}-${selectedTrip.imageData.userID}\/">${selectedTrip.imageData.user}</a></cite> from <cite><a target="_blank" href="https://pixabay.com/">Pixabay</a></cite>`;
+  }
+  return imageDisplayData;
 }
 
 function displayPlannedActivities(activitiesList) {
@@ -123,9 +269,9 @@ function displayPlannedActivities(activitiesList) {
     return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
   }
 
-  const activitiesHTML = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div>';
+  let activitiesHTML = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div>';
   const activities = activitiesList;
-  for(activity of activities) {
+  for(let activity of activities) {
     activitiesHTML += '<div class="data-row custom-table-row">';
     activitiesHTML += `<div class="description-box custom-table-entry">${activity.description}</div>`;
     activitiesHTML += `<div class="custom-table-entry">${activity.setTime}</div>`;
@@ -139,13 +285,63 @@ function displayWeatherData(weatherForecasts) {
   return '<div class="forecast-box"></div>';
 }
 
-function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
-  const tripSchedule = document.getElementById('trip-schedule-table');
+function displaySelectedTrip(selectedTrip, temporaryImageURL) {
   const plannedActivities = document.getElementById('planned-activities-table');
   const weatherDisplay = document.querySelector('.weather-display');
   const locationImage = document.querySelector('img');
   const imageCaption = document.querySelector('figcaption');
- 
+  
+  let plannedActivitiesRows = '';
+  let weatherForecastDisplay = '';
+  let selectedImage = '';
+  let attributionMessage = '';
+  let tripTitle = '';
+  let dateRange = '';
+  let tripLocation = '';
+  let imageDisplayData = '';
+
+  if(selectedTrip !== null) {
+    imageDisplayData = displayImageData(selectedTrip, temporaryImageURL);
+    selectedImage = imageDisplayData.url;
+    attributionMessage = imageDisplayData.attributionMessage;
+    plannedActivitiesRows = displayPlannedActivities(selectedTrip.activities);
+    weatherForecastDisplay = displayWeatherData(selectedTrip.weatherForecasts);
+    
+    tripTitle = selectedTrip.title;
+    const selectedTripStartDate = new Date(selectedTrip.startDate);
+    const selectedTripEndDate = new Date(selectedTrip.endDate);
+    const startDateString = `${selectedTripStartDate.getMonth() + 1}\/${selectedTripStartDate.getDate()}\/${selectedTripStartDate.getFullYear()}`;
+    const endDateString = `${selectedTripEndDate.getMonth() + 1}\/${selectedTripEndDate.getDate()}\/${selectedTripEndDate.getFullYear()}`;
+    dateRange = `${startDateString} - ${endDateString}`;
+    tripLocation = `${selectedTrip.city}, ${selectedTrip.administrativeDivision}, ${selectedTrip.country}`;
+  }
+  else {
+    plannedActivitiesRows = displayPlannedActivities([]);
+    weatherForecastDisplay = displayWeatherData([]);
+    imageDisplayData = displayImageData(null);
+    selectedImage = imageDisplayData.url;
+    attributionMessage = imageDisplayData.attributionMessage;
+    tripTitle = 'Imagine an Amazing Trip!';
+    tripLocation = 'Choose Your Destination!';
+    dateRange = 'See How Long You Will Stay!';
+  }
+  
+  const tripTitleHeader = document.getElementById('trip-title-header');
+  const tripDestinationHeader = document.getElementById('trip-destination-header');
+  const tripDurationHeader = document.getElementById('trip-duration-header');
+
+  tripTitleHeader.innerHTML = tripTitle;
+  tripDestinationHeader.innerHTML = tripLocation;
+  tripDurationHeader.innerHTML = dateRange; 
+  plannedActivities.innerHTML = plannedActivitiesRows;
+  weatherDisplay.innerHTML = weatherForecastDisplay;
+  locationImage.setAttribute('src', selectedImage);
+  imageCaption.innerHTML = attributionMessage;
+}
+
+function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
+  const tripSchedule = document.getElementById('trip-schedule-table');
+  
   let tripTableRows = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry">Title</div><div class="custom-table-entry">City</div><div class="custom-table-entry">Admin. Division</div><div class="custom-table-entry">Country</div><div class="custom-table-entry">Start Date</div><div class="custom-table-entry">End Date</div></div>';
 
   for(let someTrip of sortedListOfTrips) {
@@ -160,39 +356,11 @@ function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
     tableRow += `<div class="custom-table-entry">${endDate.getMonth() + 1}\/${endDate.getDate()}\/${endDate.getFullYear()}</div>`;
     tableRow += '</div>';
     tripTableRows += tableRow;
-  }
-
-  const plannedActivitiesRows = displayPlannedActivities(selectedTrip.activities);
-  const weatherForecastDisplay = displayWeatherData(selectedTrip.weatherForecasts);
-
-  let selectedImage = '';
-  let attributionMessage = '';
-  if(selectedTrip.imageData.imageID === null) {
-    selectedImage = 'images/NoImageFound.png';
-    attributionMessage = 'Sorry, no images were found for this location.'
-  }
-  else {
-    selectedImage = temporaryImageURL;
-    attributionMessage = `${selectedTrip.imageData.imageLocation}. Image by <cite><a target="_blank" href="https:\/\/pixabay.com\/users\/${selectedTrip.imageData.user}-${selectedTrip.imageData.userID}\/">${selectedTrip.imageData.user}</a></cite> from <cite><a target="_blank" href="https://pixabay.com/">Pixabay</a></cite>`;
-  }
-  
-  const tripTitleHeader = document.getElementById('trip-title-header');
-  const tripDestinationHeader = document.getElementById('trip-destination-header');
-  const tripDurationHeader = document.getElementById('trip-duration-header');
-  
-  const selectedTripStartDate = new Date(selectedTrip.startDate);
-  const selectedTripEndDate = new Date(selectedTrip.endDate);
-  const startDateString = `${selectedTripStartDate.getMonth() + 1}\/${selectedTripStartDate.getDate()}\/${selectedTripStartDate.getFullYear()}`;
-  const endDateString = `${selectedTripEndDate.getMonth() + 1}\/${selectedTripEndDate.getDate()}\/${selectedTripEndDate.getFullYear()}`;
-
-  tripTitleHeader.innerHTML = selectedTrip.title;
-  tripDestinationHeader.innerHTML = `${selectedTrip.city}, ${selectedTrip.administrativeDivision}, ${selectedTrip.country}`;
-  tripDurationHeader.innerHTML = `${startDateString} - ${endDateString}`;
+  } 
+ 
   tripSchedule.innerHTML = tripTableRows;
-  plannedActivities.innerHTML = plannedActivitiesRows;
-  weatherDisplay.innerHTML = weatherForecastDisplay;
-  locationImage.setAttribute('src', selectedImage);
-  imageCaption.innerHTML = attributionMessage;
+
+  displaySelectedTrip(selectedTrip, temporaryImageURL);
 }
 
 async function findLocationPhotograph(imageData) {
@@ -207,6 +375,7 @@ async function findLocationPhotograph(imageData) {
   let serverResponse = null;
   for(let photoCategory of photoCategories) {
     imageQuery.photoType = photoCategory;
+    console.log(imageQuery);
     serverResponse = await getServerData(imageQuery, 'pixabayImages');
 
     try {
@@ -249,6 +418,15 @@ async function getServerData(givenData, givenRoute) {
   catch(error) {
     return error;
   }
+}
+
+function loadTripData() {
+  getServerData({someTrip: null, method: 'retrieve'}, 'listOfTrips').then(function(data) {
+    displayTripData(data.tripList, null, null);
+  }).catch(function(error) {
+    console.log(`Error: ${error}`);
+    document.querySelector('.trip-schedule').insertAdjacentHTML('afterbegin', '<p class="error">The data could not be loaded from the server.');
+  });
 }
 
 function processWeatherData(weatherInfo) {
@@ -418,12 +596,17 @@ function generateTripData(submitEvent) {
     return;
   }
 
+  if(tripTitleInput.value.length > 100) {
+    tripTitleInput.insertAdjacentHTML('afterend', '<p class="error">Please enter 100 characters or less.</p>');
+    return;
+  }
   tripData.title = tripTitleInput.value;
 
   const validDates = checkDateInput([startDateInput, endDateInput]);
   if(!validDates) {
     return;
   }
+
   const startDateComponents = startDateInput.value.split('/');
   const endDateComponents = endDateInput.value.split('/');
   tripData.startDate = new Date(startDateComponents[2], `${parseInt(startDateComponents[0]) - 1}`, startDateComponents[1]);
@@ -458,7 +641,7 @@ function generateTripData(submitEvent) {
 	tripData.imageData.imageLocation = imageResults.foundLocation;
 	tripData.imageData.user = imageResults.user;
 	tripData.imageData.userID = imageResults.userID;
-	getServerData({someTrip: tripData}, 'listOfTrips').then(function(serverData) {
+	getServerData({someTrip: tripData, method: 'insert'}, 'listOfTrips').then(function(serverData) {
 	  const sortedTrips = serverData.tripList;
 	  console.log(sortedTrips);
 	  displayTripData(sortedTrips, tripData, imageResults.largeImageURL);
@@ -485,16 +668,19 @@ function generateTripData(submitEvent) {
 }
 
 export {
+  accessTripData,
   addActivity,
   checkForBlankFields,
   checkDateInput,
   deleteActivityData,
-  deleteAPIData,
+  deleteServerData,
   displayPlannedActivities,
+  displaySelectedTrip,
   displayTripData,
   displayWeatherData,
   getDaysElapsed,
   getServerData,
+  loadTripData,
   processWeatherData,
   locationFound,
   generateTripData,

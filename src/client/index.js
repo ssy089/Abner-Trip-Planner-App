@@ -1,13 +1,16 @@
+import { accessTripData } from './js/app';
 import { addActivity} from './js/app';
 import { checkForBlankFields } from './js/app';
 import { checkDateInput } from './js/app';
 import { deleteActivityData } from './js/app';
-import { deleteAPIData } from './js/app';
+import { deleteServerData } from './js/app';
 import { displayPlannedActivities } from './js/app';
+import { displaySelectedTrip } from './js/app';
 import { displayTripData } from './js/app';
 import { displayWeatherData } from './js/app';
 import { getDaysElapsed } from './js/app';
 import { getServerData } from './js/app';
+import { loadTripData } from './js/app';
 import { processWeatherData } from './js/app';
 import { locationFound } from './js/app';
 import { generateTripData } from './js/app';
@@ -47,23 +50,30 @@ function selectRow(rowSelected) {
   }
 }
 
-document.getElementById('schedule-trip').addEventListener('click', generateTripData);
-document.getElementById('trip-schedule-table').addEventListener('click', selectRow);
-document.getElementById('planned-activities-table').addEventListener('click', selectRow);
-document.getElmentById('activity-info-buttons').addEventListener('click', deleteActivityData);
-document.getElementById('add-activity').addEventListener('click', addActivity);
+document.addEventListener('DOMContentLoaded', loadTripData);
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('schedule-trip').addEventListener('click', generateTripData);
+  document.getElementById('trip-schedule-table').addEventListener('click', selectRow);
+  document.getElementById('planned-activities-table').addEventListener('click', selectRow);
+  document.getElementById('trip-info-buttons').addEventListener('click', accessTripData);
+  document.getElementById('activity-info-buttons').addEventListener('click', deleteActivityData);
+  document.getElementById('add-activity').addEventListener('click', addActivity);
+});
 
 export {
+  accessTripData,
   addActivity,
   checkForBlankFields,
   checkDateInput,
   deleteActivityData,
-  deleteAPIData,
+  deleteServerData,
   displayPlannedActivities,
+  displaySelectedTrip,
   displayTripData,
   displayWeatherData,
   getDaysElapsed,
   getServerData,
+  loadTripData,
   processWeatherData,
   locationFound,
   generateTripData,

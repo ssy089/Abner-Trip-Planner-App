@@ -282,7 +282,63 @@ function displayPlannedActivities(activitiesList) {
 }
 
 function displayWeatherData(weatherForecasts) {
-  return '<div class="forecast-box"></div>';
+  if(weatherForecasts === null) {
+    return '<div class="forecast-box"></div>';
+  }
+
+  let forecastBoxes = '';
+  for(let weatherForecast of weatherForecasts) {
+    let forecastBox = '<div class="forecast-box">';
+    forecastBox += `<div class="forecast-date">${weatherForecast.forecastDate}</div>`;
+    forecastBox += '<div class="main-weather-info"><img src="' + weatherForecast.iconImage + '" alt="' + weatherForecast.description + '">';
+    forecastBox += `<div class="small-weather-info"><div><strong>MMT:</strong> ${weatherForecast.maxTemperature}\/${weatherForecast.minTemperature}</div>`;
+    forecastBox += `<div><strong>RH:</strong> ${weatherForecast.relativeHumidity}</div>`;
+    forecastBox += `<div><strong>AP:</strong> ${weatherForecast.averagePressure}</div>`;
+    forecastBox += `<div><strong>MUV:</strong> ${weatherForecast.maxUVIndex}</div></div></div>`;
+    forecastBox += `<div class="general-weather-info">${weatherForecast.description}</div>`;
+    forecastBox += `<div class="general-weather-info">ATCC: ${weatherForecast.averageTotalCloudCoverage}</div>`;
+    forecastBox += `<div class="general-weather-info">WDWS: ${weatherForecast.windDirection}, ${weatherForecast.windSpeed}</div>`;
+    forecastBox += `<div class="general-weather-info">PoP: ${weatherForecast.probabilityOfPrecipitation}</div>`;
+    if(weatherForecast.iconCode.match(/c0[1-4]d/i)) {
+      forecastBox += `</div>`;
+    }
+    else {
+      forecastBox += '<h4>Addtional Weather Information</h4>';
+      forecastBox += '<div class="additional-weather-info">';
+      if(weatherForecast.iconCode.match(/t0[1-5]d/i)) {
+        forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
+	forecastBox += `<div>WGS: ${weatherForecast.additionalData.windGustSpeed}</div>`;
+	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}</div>`;
+      }
+      else if(weatherForecast.iconCode.match(/[frud]0[0-6]d/i)) {
+        forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
+	if(weatherForecast.iconCode.match(/[fru]0[0-6]d/i)) {
+	  forecastBox += `<div>WGS: ${weatherForecast.additionalData.windGustSpeed}</div>`;
+	}
+	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}</div>`;
+      }
+      else if(weatherForecast.iconCode.match(/s0[1-6]d/i)) {
+        forecastBox += `<div>Snow: ${weatherForecast.additionalData.snow}</div>`;
+	forecastBox += `<div>Snow Depth: ${weatherForecast.additionalData.snowDepth}</div>`;
+	forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
+	forecastBox += `<div>WGS: ${weatherForecast.additionalData.windGustSpeed}</div>`;
+	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}</div>`;
+      }
+      else if(weatherForecast.iconCode.match(/a0[1-6]d/)) {
+        if(weatherForecast.iconCode.match(/a0[156]d/)) {
+	  if(weatherForecast.iconCode === 'a06d') {
+	    forecastBox += `<div>Snow: ${weatherForecast.additionalData.snow}`;
+	  }
+	  forecastBox += `<div>LLCC: ${weatherForecast.additionalData.lowLevelCloudCoverage}</div>`;
+	  forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
+	}
+	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}`;
+      }
+      forecastBox += '</div></div>';
+    }
+    forecastBoxes += forecastBox;
+  }
+  return forecastBoxes;
 }
 
 function displaySelectedTrip(selectedTrip, temporaryImageURL) {
@@ -445,7 +501,7 @@ function processWeatherData(weatherInfo) {
       averagePressure: weatherForecast.pres.toFixed() + ' mb',
       relativeHumidity: weatherForecast.rh + '%',
       averageTotalCloudCoverage: weatherForecast.clouds + '%',
-      maxUVIndex: weatherForecast.uv,
+      maxUVIndex: weatherForecast.uv.toFixed(2) + ' of 10',
       additionalData: {
         windGustSpeed: weatherForecast.wind_gust_spd.toFixed() + ' m/s',
 	precipitation: weatherForecast.precip.toFixed() + ' mm',
@@ -475,7 +531,7 @@ function processWeatherData(weatherInfo) {
     else if(dailyForecast.iconCode.match(/d0[1-3](d|n)/)) {
       dailyForecast.iconImage = 'images/icon_d01d.png';
     }
-    else if(dailyForecast.iconCode.match(/[fru][0124](d|n)/)) {
+    else if(dailyForecast.iconCode.match(/[fru]0[0124](d|n)/)) {
       dailyForecast.iconImage = 'images/icon_r01d.png';
     }
     else if(dailyForecast.iconCode.match(/r03(d|n)/)) {

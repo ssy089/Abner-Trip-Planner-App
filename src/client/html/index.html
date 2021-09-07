@@ -96,6 +96,24 @@
 	<div class="weather-display">
 	  <div class="forecast-box"></div>
 	</div>
+	<div class="weather-key">
+	  <div class="weather-key-column">
+	    <div>AP - Average Pressure</div>
+            <div>ATCC - Average Total Cloud Coverage</div>
+	    <div>LLCC - Low-Level Cloud Coverage (~0-3km AGL)</div>
+	    <div>MMT - Maximum Temperature/Minimum Temperature</div>
+            <div>MUV - Maximum UV Index</div>
+            <div>PoP - Probability of Precipitation</div> 
+	  </div>
+	  <div class="weather-key-column"> 
+	    <div>Precip - Accumulated Liquid Equivalent Precipitation</div>
+            <div>RH - Average Relative Humidity</div>
+	    <div>Snow - Accumulated Snowfall</div>
+	    <div>WDWS - Wind Direction, Wind Speed</div>
+	    <div>WGS - Wind Gust Speed</div>
+	    <div>Vis - Visibility</div>
+	  </div>
+	</div>
 	<form>
 	  <input type="submit" value="Update Forecast" id="weather-display">
 	</form>
@@ -104,7 +122,7 @@
         <h3>Planned Activities</h3>
         <div class="custom-table" id="planned-activities-table">
           <div class="custom-table-headers custom-table-row">
-	    <div class="description-box custom-table-entry">Description</div>
+	    <div class="custom-table-entry">Description</div>
 	    <div class="custom-table-entry">Time</div>
 	    <div class="custom-table-entry">Date</div>
 	  </div>

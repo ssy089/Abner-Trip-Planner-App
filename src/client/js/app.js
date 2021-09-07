@@ -266,10 +266,10 @@ function displayImageData(selectedTrip, temporaryImageURL) {
 
 function displayPlannedActivities(activitiesList) {
   if(activitiesList.length === 0) {
-    return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+    return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
   }
 
-  let activitiesHTML = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry description-box">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div>';
+  let activitiesHTML = '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div>';
   const activities = activitiesList;
   for(let activity of activities) {
     activitiesHTML += '<div class="data-row custom-table-row">';
@@ -296,9 +296,9 @@ function displayWeatherData(weatherForecasts) {
     forecastBox += `<div><strong>AP:</strong> ${weatherForecast.averagePressure}</div>`;
     forecastBox += `<div><strong>MUV:</strong> ${weatherForecast.maxUVIndex}</div></div></div>`;
     forecastBox += `<div class="general-weather-info">${weatherForecast.description}</div>`;
-    forecastBox += `<div class="general-weather-info">ATCC: ${weatherForecast.averageTotalCloudCoverage}</div>`;
-    forecastBox += `<div class="general-weather-info">WDWS: ${weatherForecast.windDirection}, ${weatherForecast.windSpeed}</div>`;
-    forecastBox += `<div class="general-weather-info">PoP: ${weatherForecast.probabilityOfPrecipitation}</div>`;
+    forecastBox += `<div class="general-weather-info"><strong>ATCC:</strong> ${weatherForecast.averageTotalCloudCoverage}</div>`;
+    forecastBox += `<div class="general-weather-info"><strong>WDWS:</strong> ${weatherForecast.windDirection}, ${weatherForecast.windSpeed}</div>`;
+    forecastBox += `<div class="general-weather-info"><strong>PoP:</strong> ${weatherForecast.probabilityOfPrecipitation}</div>`;
     if(weatherForecast.iconCode.match(/c0[1-4]d/i)) {
       forecastBox += `</div>`;
     }
@@ -306,33 +306,33 @@ function displayWeatherData(weatherForecasts) {
       forecastBox += '<h4>Addtional Weather Information</h4>';
       forecastBox += '<div class="additional-weather-info">';
       if(weatherForecast.iconCode.match(/t0[1-5]d/i)) {
-        forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
-	forecastBox += `<div>WGS: ${weatherForecast.additionalData.windGustSpeed}</div>`;
-	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}</div>`;
+        forecastBox += `<div><strong>Precip:</strong> ${weatherForecast.additionalData.precipitation}</div>`;
+	forecastBox += `<div><strong>WGS:</strong> ${weatherForecast.additionalData.windGustSpeed}</div>`;
+	forecastBox += `<div><strong>Vis:</strong> ${weatherForecast.additionalData.visibility}</div>`;
       }
       else if(weatherForecast.iconCode.match(/[frud]0[0-6]d/i)) {
-        forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
+        forecastBox += `<div><strong>Precip:</strong> ${weatherForecast.additionalData.precipitation}</div>`;
 	if(weatherForecast.iconCode.match(/[fru]0[0-6]d/i)) {
-	  forecastBox += `<div>WGS: ${weatherForecast.additionalData.windGustSpeed}</div>`;
+	  forecastBox += `<div><strong>WGS:</strong> ${weatherForecast.additionalData.windGustSpeed}</div>`;
 	}
-	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}</div>`;
+	forecastBox += `<div><strong>Vis:</strong> ${weatherForecast.additionalData.visibility}</div>`;
       }
       else if(weatherForecast.iconCode.match(/s0[1-6]d/i)) {
-        forecastBox += `<div>Snow: ${weatherForecast.additionalData.snow}</div>`;
-	forecastBox += `<div>Snow Depth: ${weatherForecast.additionalData.snowDepth}</div>`;
-	forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
-	forecastBox += `<div>WGS: ${weatherForecast.additionalData.windGustSpeed}</div>`;
-	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}</div>`;
+        forecastBox += `<div><strong>Snow:</strong> ${weatherForecast.additionalData.snow}</div>`;
+	forecastBox += `<div><strong>Snow Depth:</strong> ${weatherForecast.additionalData.snowDepth}</div>`;
+	forecastBox += `<div><strong>Precip:</strong> ${weatherForecast.additionalData.precipitation}</div>`;
+	forecastBox += `<div><strong>WGS:</strong> ${weatherForecast.additionalData.windGustSpeed}</div>`;
+	forecastBox += `<div><strong>Vis:</strong> ${weatherForecast.additionalData.visibility}</div>`;
       }
       else if(weatherForecast.iconCode.match(/a0[1-6]d/)) {
         if(weatherForecast.iconCode.match(/a0[156]d/)) {
 	  if(weatherForecast.iconCode === 'a06d') {
-	    forecastBox += `<div>Snow: ${weatherForecast.additionalData.snow}`;
+	    forecastBox += `<div><strong>Snow:</strong> ${weatherForecast.additionalData.snow}`;
 	  }
-	  forecastBox += `<div>LLCC: ${weatherForecast.additionalData.lowLevelCloudCoverage}</div>`;
-	  forecastBox += `<div>Precip: ${weatherForecast.additionalData.precipitation}</div>`;
+	  forecastBox += `<div><strong>LLCC:</strong> ${weatherForecast.additionalData.lowLevelCloudCoverage}</div>`;
+	  forecastBox += `<div><strong>Precip:</strong> ${weatherForecast.additionalData.precipitation}</div>`;
 	}
-	forecastBox += `<div>Vis: ${weatherForecast.additionalData.visibility}`;
+	forecastBox += `<div><strong>Vis:</strong> ${weatherForecast.additionalData.visibility}`;
       }
       forecastBox += '</div></div>';
     }
@@ -369,6 +369,9 @@ function displaySelectedTrip(selectedTrip, temporaryImageURL) {
     const startDateString = `${selectedTripStartDate.getMonth() + 1}\/${selectedTripStartDate.getDate()}\/${selectedTripStartDate.getFullYear()}`;
     const endDateString = `${selectedTripEndDate.getMonth() + 1}\/${selectedTripEndDate.getDate()}\/${selectedTripEndDate.getFullYear()}`;
     dateRange = `${startDateString} - ${endDateString}`;
+    if(selectedTrip.expired) {
+      dateRange += ' (Expired)';
+    }
     tripLocation = `${selectedTrip.city}, ${selectedTrip.administrativeDivision}, ${selectedTrip.country}`;
   }
   else {
@@ -402,6 +405,9 @@ function displayTripData(sortedListOfTrips, selectedTrip, temporaryImageURL) {
 
   for(let someTrip of sortedListOfTrips) {
     let tableRow = '<div class="custom-table-row data-row">';
+    if(someTrip.expired) {
+      tableRow = '<div class="custom-table-row data-row expired-trip">';
+    }
     let startDate = new Date(someTrip.startDate);
     let endDate = new Date(someTrip.endDate);
     tableRow += `<div class="custom-table-entry">${someTrip.title}</div>`;
@@ -670,7 +676,11 @@ function generateTripData(submitEvent) {
   tripData.numberOfDays = getDaysElapsed(tripData.startDate, tripData.endDate);
   const todayDate = new Date();
   tripData.countdown = getDaysElapsed(todayDate, tripData.startDate);
-  if(getDaysElapsed(todayDate, tripData.endDate) <= 0) {
+  if(getDaysElapsed(tripData.startDate, tripData.endDate) < 0) {
+    endDateInput.insertAdjacentHTML('afterend', '<p class="error">The end date must be on the same day as the start date, or it must be a day after the start date.</p>');
+    return;
+  }
+  if(getDaysElapsed(todayDate, tripData.endDate) < 0) {
     tripData.expired = true;
   }
 
@@ -721,6 +731,61 @@ function generateTripData(submitEvent) {
     document.getElementById('schedule-trip').insertAdjacentHTML('afterend', '<p class="error">An error occurred while sending a request to the server</p>');
     return;
   }); 
+}
+
+async function updateServerData(givenQuery, givenRoute) {
+  const serverResponse = await fetch('http://localhost:8081/' + givenRoute, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(givenData)
+  });
+
+  try {
+    const responseData = await serverResponse.json();
+    return responseData;
+  }
+  catch(error) {
+    return error;
+  }
+}
+
+function updateWeatherForecasts(clickEvent) {
+  clickEvent.preventDefault();
+
+  const weatherErrors = document.querySelector('.weather-forecast').querySelectorAll('.error');
+  for(let weatherError of weatherErrors) {
+    weatherError.remove();
+  }
+
+  const selectedTripRow = document.getElementById('trip-schedule-table').querySelector('.selected-data-row');
+  if(selectedTripRow === null) {
+    document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">A trip must be displayed in order to update its weather information.</p>');
+    return;
+  }
+  const selectedTripData = selectedTripRow.children;
+  let givenStartDateComponents = selectedTripData[4].textContent.split('/'); 
+  let givenStartDate = new Date(givenStartDateComponents[2], `${parseInt(givenStartDateComponents[0]) - 1}`, givenStartDateComponents[1]);
+  let givenEndDateComponents = selectedTripData[5].textContent.split('/');
+  let givenEndDate = new Date(givenEndDateComponents[2], `${parseInt(givenEndDateComponents[0]) - 1}`, givenEndDateComponents[1]);
+  const tripData = {
+    title: selectedTripData[0].textContent,
+    city: selectedTripData[1].textContent,
+    startDate: givenStartDate,
+    endDate: givenEndDate
+  };
+  getServerData({someTrip: tripData, method: 'retrieve'}, 'listOfTrips').then(function(data) {
+    getServerData({latitude: data.latitude, longitude: data.longitude}, 'weatherForecast').then(function(weatherData) {
+      
+    }).catch(function(error) {
+      console.log(`Error: ${error}`);
+      clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred while retrieving new weather data from the server.</p>');
+    });
+  }).catch(function(error) {
+    console.log(`Error: ${error}`);
+    clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred while retrieving the trip data from the server.</p>');
+  });
 }
 
 export {

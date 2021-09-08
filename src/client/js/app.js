@@ -733,7 +733,7 @@ function generateTripData(submitEvent) {
   }); 
 }
 
-async function updateServerData(givenQuery, givenRoute) {
+async function updateServerData(givenData, givenRoute) {
   const serverResponse = await fetch('http://localhost:8081/' + givenRoute, {
     method: 'PUT',
     headers: {
@@ -761,7 +761,7 @@ function updateWeatherForecasts(clickEvent) {
 
   const selectedTripRow = document.getElementById('trip-schedule-table').querySelector('.selected-data-row');
   if(selectedTripRow === null) {
-    document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">A trip must be displayed in order to update its weather information.</p>');
+    clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">A trip must be selected in order to update its weather information.</p>');
     return;
   }
   const selectedTripData = selectedTripRow.children;
@@ -776,8 +776,21 @@ function updateWeatherForecasts(clickEvent) {
     endDate: givenEndDate
   };
   getServerData({someTrip: tripData, method: 'retrieve'}, 'listOfTrips').then(function(data) {
-    getServerData({latitude: data.latitude, longitude: data.longitude}, 'weatherForecast').then(function(weatherData) {
-      
+    console.log(data);
+    getServerData({latitude: data.selectedTrip.latitude, longitude: data.selectedTrip.longitude}, 'weatherForecast').then(function(weatherData) {
+      console.log(weatherData);
+      if(weatherData.message === 'An error occurred on the server while processing the data.') {
+        clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred on the server while generating the weather forecasts.</p>');
+      }
+      else {
+        const updatedForecasts = processWeatherData(weatherData.weatherInfo);
+	updateServerData({newWeatherForecasts: updatedForecasts}, 'weatherForecast').then(function(updateResponse) {
+	  displayWeatherData(updatedForecasts);
+	}).catch(function(error) {
+	  console.log(`Error: ${error}`);
+	  clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred while updating the weather data on the server.</p>');
+	});
+      }
     }).catch(function(error) {
       console.log(`Error: ${error}`);
       clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred while retrieving new weather data from the server.</p>');
@@ -805,5 +818,7 @@ export {
   processWeatherData,
   locationFound,
   generateTripData,
-  findLocationPhotograph
+  findLocationPhotograph,
+  updateServerData,
+  updateWeatherForecasts
 };

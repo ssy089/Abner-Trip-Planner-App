@@ -15,6 +15,8 @@ import { processWeatherData } from './js/app';
 import { locationFound } from './js/app';
 import { generateTripData } from './js/app';
 import { findLocationPhotograph } from './js/app';
+import { updateServerData } from './js/app';
+import { updateWeatherForecasts } from './js/app';
 import regeneratorRuntime from 'regenerator-runtime'; //This module is used to provide a runtime for async functions.
 
 import './styles/base.scss';
@@ -50,7 +52,6 @@ function selectRow(rowSelected) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadTripData);
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('schedule-trip').addEventListener('click', generateTripData);
   document.getElementById('trip-schedule-table').addEventListener('click', selectRow);
@@ -58,7 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('trip-info-buttons').addEventListener('click', accessTripData);
   document.getElementById('activity-info-buttons').addEventListener('click', deleteActivityData);
   document.getElementById('add-activity').addEventListener('click', addActivity);
+  document.getElementById('update-weather-display').addEventListener('click', updateWeatherForecasts);
 });
+document.addEventListener('DOMContentLoaded', loadTripData);
 
 export {
   accessTripData,
@@ -78,5 +81,7 @@ export {
   locationFound,
   generateTripData,
   findLocationPhotograph,
-  regeneratorRuntime
+  regeneratorRuntime,
+  updateServerData,
+  updateWeatherForecasts
 };

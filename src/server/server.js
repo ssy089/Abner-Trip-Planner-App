@@ -327,6 +327,13 @@ app.post('/weatherForecast', function(req, res) {
   });
 });
 
+app.put('/weatherForecast', function(req, res) {
+  currentlySelectedTrip.weatherForecasts = req.body.newWeatherForecasts;
+  listOfTrips[currentlySelectedIndex].weatherForecasts = req.body.newWeatherForecasts;
+  res.status = 200;
+  res.json({message: 'The weather forecasts for the currently selected trip have been updated.'});
+});
+
 app.post('/pixabayImages', function(req, res) {
   let givenQuery = '';
   if(req.body.id !== '') {

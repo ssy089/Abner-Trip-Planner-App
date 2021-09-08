@@ -96,7 +96,7 @@ function mergeTripArrays(mergedArray, leftArrayStart, midPoint, rightArrayEnd) {
   return mergedArray;
 }
 
-export {
+module.exports = {
   mergeTripArrays,
   tripsIterativeMergeSort
 };

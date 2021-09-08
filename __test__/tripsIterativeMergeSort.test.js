@@ -1,5 +1,5 @@
-import { mergeTripArrays } from '../src/server/sortTrips';
-import { tripsIterativeMergeSort } from '../src/server/sortTrips';
+const mergeTripArrays = require('../src/server/sortTrips').mergeTripArrays;
+const tripsIterativeMergeSort = require('../src/server/sortTrips').tripsIterativeMergeSort;
 
 const someArray = [
   {

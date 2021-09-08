@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('activity-info-buttons').addEventListener('click', deleteActivityData);
   document.getElementById('add-activity').addEventListener('click', addActivity);
   document.getElementById('update-weather-display').addEventListener('click', updateWeatherForecasts);
+  document.getElementById('show-all-trips').addEventListener('click', loadTripData);
 });
-document.addEventListener('DOMContentLoaded', loadTripData);
 
 export {
   accessTripData,

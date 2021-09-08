@@ -482,12 +482,14 @@ async function getServerData(givenData, givenRoute) {
   }
 }
 
-function loadTripData() {
+function loadTripData(clickEvent) {
+  clickEvent.preventDefault();
+
   getServerData({someTrip: null, method: 'retrieve'}, 'listOfTrips').then(function(data) {
     displayTripData(data.tripList, null, null);
   }).catch(function(error) {
     console.log(`Error: ${error}`);
-    document.querySelector('.trip-schedule').insertAdjacentHTML('afterbegin', '<p class="error">The data could not be loaded from the server.');
+    clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">The data could not be loaded from the server.');
   });
 }
 

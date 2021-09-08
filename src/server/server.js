@@ -1,5 +1,5 @@
-import { mergeTripArrays } from './sortTrips';
-import { tripsIterativeMergeSort } from './sortTrips';
+const mergeTripArrays = require('./sortTrips').mergeTripArrays;
+const tripsIterativeMergeSort = require('./sortTrips').tripsIterativeMergeSort;
 
 /* Setup environemnt variables using the .env file. */
 const dotenv = require('dotenv');
@@ -363,5 +363,3 @@ app.post('/pixabayImages', function(req, res) {
     });     
   }
 });
-
-export { mergeTripArrays };

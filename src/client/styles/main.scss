@@ -1,7 +1,10 @@
+/* Styling for the main content of the webpage */
+
 a {
   color: #ff4500;
 }
 
+/* Styling for the content in the main element */
 main {
   align-items: center;
   color: #ff4500;
@@ -19,6 +22,7 @@ img {
   width: 700px;
 }
 
+/* Styling for each section of the main content */
 section {
   align-items: center;
   border-bottom: thin solid #ff7f50;
@@ -33,10 +37,12 @@ section {
   }
 }
 
+/* Styling for the element that contains additional information for a weather forecast */
 .additional-weather-info {
   margin-left: 2em;
 }
 
+/* Styling for the webpage's tables */
 .custom-table {
   background-color: #fff;
   border: thin solid #ff7f50;
@@ -49,6 +55,7 @@ section {
   width: min-content;
 }
 
+/* Styling for the webpage's table entries */
 .custom-table-entry {
   border: thin solid #ff7f50;
   height: 75px;
@@ -58,6 +65,7 @@ section {
   word-break: keep-all;
 }
 
+/* Styling for the webpage's table header rows */
 .custom-table-headers {
   display: flex;
   flex-direction: row;
@@ -68,6 +76,7 @@ section {
   }
 }
 
+/* Styling for the webpage's table rows */
 .custom-table-row { 
   display: flex;
   flex-direction: row;
@@ -75,19 +84,23 @@ section {
   width: min-content; 
 }
 
+/* Styling for the hover state of the webpage's rows that contain data */
 .data-row:hover {
   background-color: #add8e6;
 }
 
+/* Styling for the description box column of the activities table */
 .description-box {
   font-size: 0.75em;
 }
 
+/* Styling for trip table rows that correspond to expired trips */
 .expired-trip {
   color: #f00;
   background-color: #ffb6c1;
 }
 
+/* Styling for the element containing an individual weather forecast */
 .forecast-box {
   background-color: #add8e6;
   box-shadow: inset 2px 2px #fff, inset -2px -2px #fff;
@@ -100,6 +113,7 @@ section {
   }
 }
 
+/* Styling for the element containing a forecast's date */
 .forecast-date {
   background-color: #000080;
   color: #fff;
@@ -107,10 +121,12 @@ section {
   text-align: center;
 }
 
+/* Styling for the element containing the general information for a weather forecast */
 .general-weather-info {
   margin-left: 2em;
 }
 
+/* Styling for the element containing the main information for a weather forecast */
 .main-weather-info {
   display: flex;
   flex-direction: row;
@@ -123,10 +139,12 @@ section {
   }
 }
 
+/* Styling for a row that has been selected */
 .selected-data-row {
   background-color: #add8e6;
 }
 
+/* Styling for the element that contains the text for the main information of a weather forecast */
 .small-weather-info {
   display: flex;
   flex-direction: column;
@@ -135,6 +153,7 @@ section {
   text-align: left;
 }
 
+/* Styling for the headers that display a selected trip's information */
 .trip-display {
   h3,
   h4,
@@ -143,6 +162,7 @@ section {
   }
 }
 
+/* Styling for the element that contains the weather forecasts for a selected trip */
 .weather-display {
   align-items: center;
   background-color: #add8e6;
@@ -156,16 +176,19 @@ section {
   width: min-content;
 }
 
+/* Styling for the element that contains the key/legend that explains weather forecast terms and acronyms */
 .weather-key {
   display: flex;
   flex-direction: row;
   margin: 2em 0;
 }
 
+/* Styling for an individual column of the weather key/legend */
 .weather-key-column {
   margin: 0 1em;
 }
 
+/* Styling for the table containing the planned activities for a trip */
 #planned-activities-table {
   min-height: 179px;
   max-height: 331px;
@@ -182,6 +205,7 @@ section {
   }
 }
 
+/* This media query adjusts the styling for phone-sized browsers. */
 @media(max-width: 600px) {
   figcaption {
     text-align: center;
@@ -289,6 +313,7 @@ section {
   }
 }
 
+/* This media query adjusts the styling for tablet-sized browsers. */
 @media(min-width: 601px) and (max-width: 1200px) {
   img {
     height: 300px;

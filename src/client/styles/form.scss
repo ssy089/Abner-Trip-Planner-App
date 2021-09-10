@@ -1,3 +1,4 @@
+/* Styling for the form elements on the webpage. */
 form {
   align-items: center;
   display: flex;
@@ -9,6 +10,7 @@ form {
   }
 }
 
+/* Styling for the webpage's buttons */
 input[type="submit"] {
   background-color: #ff7f50;
   border-color: #ff7f50;
@@ -16,12 +18,13 @@ input[type="submit"] {
   color: #ffd700;
   font-weight: bold;
   margin: 1em 0;
+
+  &:hover {
+    border-color: #ffd700;
+  }
 }
 
-input[type="submit"]:hover {
-  border-color: #ffd700;
-}
-
+/* Styling for the text input fields */
 input[type="text"]:hover {
   border-color: #ff7f50;
 }
@@ -34,6 +37,7 @@ textarea:hover {
   border-color: #ff7f50;
 }
 
+/* Styling for the element that contains text explaining an abbreviation */
 .abbreviation-note {
   align-self: flex-end;
   font-size: small;
@@ -41,6 +45,7 @@ textarea:hover {
   text-align: end;
 }
 
+/* Styling for an element containing a group of related buttons */
 .button-group {
   display: flex;
   flex-direction: row;
@@ -48,6 +53,7 @@ textarea:hover {
   width: 400px;
 }
 
+/* Styling for related elements */
 .error {
   color: #f00;
   font-size: small;
@@ -55,6 +61,7 @@ textarea:hover {
   width: 200px;
 }
 
+/* Styling for an element containing a group of text input elements */
 .input-group {
   display: flex;
   flex-direction: row;
@@ -63,11 +70,13 @@ textarea:hover {
   width: 800px;
 }
 
+/* Styling for an element containing a textarea element and its label element */
 .textarea-input {
   display: flex;
   flex-direction: column;
 }
 
+/* This media query adjusts the styling for phone-sized browsers. */
 @media(max-width: 600px) {
   form {
     h3 {
@@ -103,7 +112,7 @@ textarea:hover {
   }
 }
 
-/* This media query adjusts the styles for tablet-sized browsers. */
+/* This media query adjusts the styling for tablet-sized browsers. */
 @media(min-width: 601px) and (max-width: 1200px) {
   .input-group {
     width: min-content;

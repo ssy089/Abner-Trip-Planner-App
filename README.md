@@ -67,3 +67,6 @@ The following APIs were used for the project:
 - [GeoNames API](http://www.geonames.org/export/) - This was used to retrieve geographic coordinates for any given location.
 - [Weatherbit's Weather API](https://www.weatherbit.io/api) - This was used to retrieve weather forecasts for any given location.
 - [Pixabay's API](https://pixabay.com/api/docs/) - This was used to retrieve a photograph for any given location.
+
+Also, the weather icons used in this application were obtained from [Weatherbit's Weather API icons](https://www.weatherbit.io/api/codes).
+These can be downloaded from [Weatherbit's Weather API Metadata page](https://www.weatherbit.io/api/meta).

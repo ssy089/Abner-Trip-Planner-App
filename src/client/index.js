@@ -1,3 +1,4 @@
+/* Import the functions from the application code for the project. */
 import { accessTripData } from './js/app';
 import { addActivity} from './js/app';
 import { checkForBlankFields } from './js/app';
@@ -17,14 +18,17 @@ import { generateTripData } from './js/app';
 import { findLocationPhotograph } from './js/app';
 import { updateServerData } from './js/app';
 import { updateWeatherForecasts } from './js/app';
+
 import regeneratorRuntime from 'regenerator-runtime'; //This module is used to provide a runtime for async functions.
 
+/* Import the styling files. */
 import './styles/base.scss';
 import './styles/footer.scss';
 import './styles/form.scss';
 import './styles/header.scss';
 import './styles/main.scss';
 
+/* Import the images for the application. */
 import './media/globe-3411506_1920.jpg';
 import './media/NoImageFound.png';
 import './media/icon_t01d.png';
@@ -43,6 +47,15 @@ import './media/icon_c02d.png';
 import './media/icon_c03d.png';
 import './media/icon_c04d.png';
 
+/* 
+ * Purpose: This function adds highlight to or
+ * removes the highlight from a table row. This
+ * allows the user to select and specific table rows.
+ *
+ * Parameters:
+ * - rowSelected: An Event generated when a table row is clicked.
+ *
+ */
 function selectRow(rowSelected) {
   const classes = rowSelected.target.parentElement.classList;
   for(let someClass of classes) {
@@ -52,6 +65,7 @@ function selectRow(rowSelected) {
   }
 }
 
+/* Once the Document Object Model content is loaded, add the webpage's functionality. */
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('schedule-trip').addEventListener('click', generateTripData);
   document.getElementById('trip-schedule-table').addEventListener('click', selectRow);
@@ -63,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('show-all-trips').addEventListener('click', loadTripData);
 });
 
+/* Export the application's function so that Webpack can access them. */
 export {
   accessTripData,
   addActivity,

@@ -10,6 +10,7 @@
       <h1>Trip Planner</h1>
     </header>
     <main>
+      <!-- This section contains the input elements that are used to add a new trip. -->
       <section class="user-input">
         <form>
           <h3>Specify Your Destination</h3>
@@ -48,6 +49,7 @@
 	  <input type="submit" value="Schedule Trip" id="schedule-trip">
 	</form>
       </section>
+      <!-- This section contains the table of scheduled trips, and its associated buttons. -->
       <section class="trip-schedule">
         <h3>Currently Scheduled Trips</h3> 
         <div class="custom-table" id="trip-schedule-table">
@@ -77,6 +79,7 @@
           </div>
 	</form>
       </section>
+      <!-- This section contains the elements that are used to display a selected trip's main information. -->
       <section class="trip-display">
         <h3 id="trip-title-header">Imagine an Amazing Trip!</h3>
 	<h4 id="trip-destination-header">Choose Your Destination!</h4>
@@ -92,6 +95,7 @@
 	  </cite>
 	</figcaption>
       </section>
+      <!-- This section contains the elements that are used to display a selected trip's weather forecasts. -->
       <section class="weather-forecast">
         <h3>Your Destination's Weather Forecast for the Next Two Weeks</h3>
 	<div class="weather-display">
@@ -119,6 +123,7 @@
 	  <input type="submit" value="Update Forecast" id="update-weather-display">
 	</form>
       </section>
+      <!-- This section contains the elements for displaying the table of planned activities, and its associated input elements. -->
       <section class="activity-planner">
         <h3>Planned Activities</h3>
         <div class="custom-table" id="planned-activities-table">
@@ -133,6 +138,7 @@
 	    <div class="custom-table-entry"></div>
 	  </div>
         </div>
+	<!-- This form contains the buttons for deleting rows from the activities table. -->
 	<form>
 	  <div class="button-group" id="activity-info-buttons">
 	    <input type="submit" value="Cancel Activity" id="cancel-activity">
@@ -140,6 +146,7 @@
 	  </div>
 	</form>
         <h3>Add an Activity</h3>
+	<!-- This form contains the text input elements and button for adding a new activity. -->
 	<form id="activity-form">
 	  <div class="textarea-input">
 	    <label for="activity-description">Describe Your Activity (Up to 250 Characters)</label>

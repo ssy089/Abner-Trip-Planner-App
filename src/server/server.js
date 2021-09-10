@@ -38,7 +38,7 @@ app.use(express.static('./dist'));
 
 /* Start the local server. */
 const server = app.listen(port, function() {
-  console.log('Travel App is running on http://localhost:8081');
+  console.log('Trip Planner App is running on http://localhost:8081');
 });
 
 /*
@@ -84,7 +84,6 @@ app.delete('/tripActivities', function(req, res) {
     /* If the client requested to delete all activities, clear the activities list. */
     if(selectedData === 'all') {
       currentlySelectedTrip.activities = [];
-      listOfTrips[currentlySelectedIndex].activities = [];
     }
     /* Otherwise, delete the specified activities. */
     else { 
@@ -98,9 +97,8 @@ app.delete('/tripActivities', function(req, res) {
 	  }
         }
       }
+      currentlySelectedTrip.activities = activities;
     }
-    currentlySelectedTrip.activities = activities;
-    listOfTrips[currentlySelectedIndex].activities = activities;
     res.status = 200;
     res.json({message: 'The data was deleted.'});
   }

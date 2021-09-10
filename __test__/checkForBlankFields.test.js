@@ -1,5 +1,10 @@
 import { checkForBlankFields } from '../src/client/js/app';
 
+/* An input list with filled input values.
+ * Note that the insertAdjacentHTML method
+ * shown here is a placeholder for the Document
+ * Object Model method of the same name.
+ */
 const inputList = [
   {
     value: 'An Exciting Trip',
@@ -11,6 +16,7 @@ const inputList = [
   }
 ];
 
+/* An input list containing a blank input value */
 const badInputList = [
   {
     value: 'One Trip',

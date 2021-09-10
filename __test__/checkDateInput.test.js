@@ -1,5 +1,10 @@
 import { checkDateInput } from '../src/client/js/app';
 
+/* An input list with valid date values.
+ * Note that the insertAdjacentHTML method
+ * shown here is a placeholder for the Document
+ * Object model method of the same name.
+ */
 const inputList = [
   {
     value: '09/30/2022',
@@ -11,6 +16,7 @@ const inputList = [
   }
 ];
 
+/* An input list containing a date in the wrong format */
 const badInputList1 = [
   {
     value: '07/02/2022',
@@ -22,6 +28,7 @@ const badInputList1 = [
   }
 ];
 
+/* An input list containing an invalid (non-existent) date */
 const badInputList2 = [
   {
     value: '02/13/2022',

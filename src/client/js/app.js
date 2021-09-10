@@ -35,7 +35,7 @@ function accessTripData(clickEvent) {
   /* If the button for canceling one or more selected trips was called, delete the selected trips. */ 
   else if(clickEvent.target.id === 'cancel-trip') {
     /* Get the list of selected rows from the trip table. Check if there are any selected rows. */
-    const canceledTrips = document.getElementById('trip-schedule-table').getElementsByClassName('selected-data-row');
+    const canceledTrips = document.getElementById('trip-schedule-table').querySelectorAll('.selected-data-row');
     if(canceledTrips.length === 0) {
       document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">One or more rows must be selected in order to delete trip data.</p>');
       return;
@@ -64,22 +64,24 @@ function accessTripData(clickEvent) {
     /* Delete the selected trip(s) from the server. Post an error message on the user interface if an error occurred. */
     deleteServerData({deleteTrips: canceledData}, 'listOfTrips').then(function(data) {}).catch(function(error) {
       console.log(`Error: ${error}`);
-      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The selected data could not be deleted from the server.');
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">The trips could not be deleted from the server.');
     });
   }
 
   /* If the button for displaying a trip was called, display the information for the selected trip. */
   else if(clickEvent.target.id === 'display-info') {
-    /* Get the selected trip. Ensure that there is at least one trip selected.
-     * Note that even if more than one trip is selected, only the first selected
-     * trip that is found will be displayed.
-     */
-    const selectedTripRow = document.getElementById('trip-schedule-table').querySelector('.selected-data-row');
-    if(selectedTripRow === null) {
-      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">A row must be selected in order to display its information.</p>');
+    /* Get the selected trip. Ensure that one trip is selected. */
+    const selectedTripRows = document.getElementById('trip-schedule-table').querySelectorAll('.selected-data-row');
+    if(selectedTripRows.length > 1) {
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Please select only one trip to diplay.</p>');
+      return;
+    } 
+    if(selectedTripRows.length === 0) {
+      document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">A trip must be selected in order to display its information.</p>');
       return;
     }
 
+    const selectedTripRow = selectedTripRows[0];
     /* Get the data from the selected row on the trip table. This will be used to get the trip's entire data. */
     const selectedTripData = selectedTripRow.children;
     let givenStartDateComponents = selectedTripData[4].textContent.split('/'); 
@@ -104,6 +106,12 @@ function accessTripData(clickEvent) {
       };
       /* Retrieve an image for the trip's location, and then display the selected trip. */
       findLocationPhotograph(imageQuery).then(function(imageRetrieved) {
+        /* Check if an error occurred on the server while retrieving the trip's location image. */
+	if(imageRetrieved.message === 'An error occurred on the server while processing the data.') {
+	  document.getElementById('trip-info-buttons').insertAdjacentHTML('afterend', '<p class="error">An error occurred on the server while retrieving the location image.</p>');
+	  return;
+	}
+        
 	displaySelectedTrip(data.selectedTrip, imageRetrieved.imageInfo.largeImageURL);
       
       /* If any errors occurred while retrieving the image, post an error message on the user interface. */
@@ -344,10 +352,10 @@ function deleteActivityData(deleteInfo) {
 
       /* If no trip is currently selected, display an error message. Otherwise, clear the activities table. */
       if(data.message === 'There is no trip that is currently displayed.') {
-        document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Select a trip in order to cancel activities.</p>');
+        document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Select and display a trip in order to cancel activities.</p>');
       }
       else {
-        document.getElementById('planned-activities-table').innerHTML = '<div class="custom-table-headers custom-table-row"><div class="description-box custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="data-row custom-table-row"><div class="description-box custom-table-entry"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+        document.getElementById('planned-activities-table').innerHTML = '<div class="custom-table-headers custom-table-row"><div class="custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="data-row custom-table-row"><div class="description-box custom-table-entry"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
       }
 
     /* If any error occurred while attempting to clear the activities list on the server, post an error message. */
@@ -361,7 +369,7 @@ function deleteActivityData(deleteInfo) {
   else if(deleteInfo.target.id === 'cancel-activity') {
 
     /* Get the selected activities, collect their data, and add them to list of canceled activities. */
-    const canceledActivities = document.getElementById('planned-activities-table').getElementsByClassName('selected-data-row');
+    const canceledActivities = document.getElementById('planned-activities-table').querySelectorAll('.selected-data-row');
     const canceledData = [];
     for(let canceledActivity of canceledActivities) {
       let activityData = canceledActivity.children;
@@ -381,7 +389,7 @@ function deleteActivityData(deleteInfo) {
 
       /* If no trip is currently selected, post an error message. Otherwise, delete the activities from the activities table. */
       if(data.message === 'There is no trip that is currently displayed.') {
-        document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Select a trip in order to cancel activities.</p>');
+        document.getElementById('activity-info-buttons').insertAdjacentHTML('afterend', '<p class="error">Select and display a trip in order to cancel activities.</p>');
       }
       else {
         for(let canceledActivity of canceledActivities) {
@@ -755,12 +763,16 @@ async function findLocationPhotograph(imageData) {
     serverResponse = await getServerData(imageQuery, 'pixabayImages');
 
     /* Check if an image was found for the given category.
-     * If so, return that image and its data. If not,
+     * If an error occurred on the server return the server message.
+     * If an image was found, return that image and its data. If not,
      * continue to the next category. If an error occurred
      * while sending a request to the server, return it.
      */
     try {
-      if(serverResponse.imageID === null) {
+      if(serverResponse.message === 'An error occurred on the server while processing the data.') {
+        return Promise.resolve(serverResponse);
+      }
+      else if(serverResponse.imageID === null) {
         continue;
       }
       else {
@@ -1145,11 +1157,23 @@ function generateTripData(submitEvent) {
 
     /* Get the weather forecasts for the trip's location. */
     getServerData({latitude: tripData.latitude, longitude: tripData.longitude}, 'weatherForecast').then(function(weatherData) {
+      /* Check if an error occurred on the server while retrieving the weather forecasts. */
+      if(weatherData.message === 'An error occurred on the server while processing the data.') {
+        submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred on the server while retrieving the weather forecasts.</p>');
+	return;
+      }
+
       tripData.weatherForecasts = processWeatherData(weatherData.weatherInfo);
       
       /* Try to find a photograph for the trip's location. */
       findLocationPhotograph({id: '', city: tripData.city, adminDiv: tripData.administrativeDivision, country: tripData.country})
       .then(function(imageResults) {
+        /* Check if an error occurred on the server while getting the trip's location image. */
+	if(imageResults === 'An error occurred on the server while processing the data.') {
+	  submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">An error occurred on the server while getting the location image.</p>');
+	  return;
+	}
+        
         /* Set the data for the trip's image. */
 	tripData.imageData.imageID = imageResults.imageID;
 	tripData.imageData.imageLocation = imageResults.foundLocation;
@@ -1253,7 +1277,7 @@ function updateWeatherForecasts(clickEvent) {
   /* Get the currently selected element. */
   const selectedTripRow = document.getElementById('trip-schedule-table').querySelector('.selected-data-row');
   if(selectedTripRow === null) {
-    clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">A trip must be selected in order to update its weather information.</p>');
+    clickEvent.target.insertAdjacentHTML('afterend', '<p class="error">A trip must be selected and displayed in order to update its weather information.</p>');
     return;
   }
 

@@ -1,6 +1,8 @@
+/* Import the functions that provide the iterative merge sort for the trip list. */
 const mergeTripArrays = require('../src/server/sortTrips').mergeTripArrays;
 const tripsIterativeMergeSort = require('../src/server/sortTrips').tripsIterativeMergeSort;
 
+/* Create an unsorted array of trips (with the minimal information needed for sorting). */
 const someArray = [
   {
     countdown: 20,
@@ -34,6 +36,7 @@ const someArray = [
   } 
 ];
 
+/* Create an array containing the sorted version of the first array. */
 const mergeSortedArray = [
   {
     countdown: 20,

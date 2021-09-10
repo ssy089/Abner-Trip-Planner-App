@@ -12,7 +12,8 @@
  * Note: This iterative merge sort
  * is based on the iterative merge sort
  * presented in the following webpage:
- * https://www.geeksforgeeks.org/iterative-merge-sort/
+ * https://www.geeksforgeeks.org/iterative-merge-sort/ 
+ * Last Date Accessed: 9/9/2021
  *
  */
 function tripsIterativeMergeSort(tripList) {
@@ -55,6 +56,7 @@ function tripsIterativeMergeSort(tripList) {
  * is based on the iterative merge sort
  * presented in the following webpage:
  * https://www.geeksforgeeks.org/iterative-merge-sort/
+ * Last Date Accessed: 9/9/2021
  *
  */
 function mergeTripArrays(mergedArray, leftArrayStart, midPoint, rightArrayEnd) {

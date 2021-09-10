@@ -183,7 +183,7 @@ function addActivity(submitEvent) {
   getServerData({givenActivity: newActivity}, 'tripActivities').then(function(data) {
     /* If no trip is currently selected, post a message on the user interface. */
     if(data.message === 'There is no trip that is currently displayed.') {
-      document.submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">Select and display a trip in order to add activities for the trip.');
+      submitEvent.target.insertAdjacentHTML('afterend', '<p class="error">Select and display a trip in order to add activities for the trip.');
     }
     /* Otherwise, display the updated list of activities for the selected trip. */
     else {
@@ -462,7 +462,7 @@ function displayPlannedActivities(activitiesList) {
    * return HTML that will set the activities table to have a blank row.
    */
   if(activitiesList.length === 0) {
-    return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div><div class="custom-table-row data-row"><div class="custom-table-entry description-box"></div><div class="custom-table-entry"></div><div class="custom-table-entry"></div></div>';
+    return '<div class="custom-table-row custom-table-headers"><div class="custom-table-entry">Description</div><div class="custom-table-entry">Time</div><div class="custom-table-entry">Date</div></div>';
   }
 
   /* Otherwise, add HTML that will add a row to the activities table for each activity. */
@@ -625,14 +625,22 @@ function displaySelectedTrip(selectedTrip, temporaryImageURL) {
     const selectedTripEndDate = new Date(selectedTrip.endDate);
     const startDateString = `${selectedTripStartDate.getMonth() + 1}\/${selectedTripStartDate.getDate()}\/${selectedTripStartDate.getFullYear()}`;
     const endDateString = `${selectedTripEndDate.getMonth() + 1}\/${selectedTripEndDate.getDate()}\/${selectedTripEndDate.getFullYear()}`;
-    dateRange = `${startDateString} - ${endDateString}`;
-    
+    dateRange = `${startDateString} - ${endDateString}, ${selectedTrip.numberOfDays} Day(s). Days Until Trip Starts: ${selectedTrip.countdown}`;
+
     /* If the trip has expired (i.e. its end date has passed),
      * add its expired status to the trip's display.
      */
     if(selectedTrip.expired) {
       dateRange += ' (Expired)';
     }
+    /* If the trip is not expired but it has already started
+     * (i.e. its start date has passed but not its end date),
+     * add its "In Progress" status to the trip's display.
+     */
+    else if(!(selectedTrip.expired) && (selectedTrip.countdown <= 0)) {
+      dateRange += ' (Trip In Progress)';
+    }
+    
     tripLocation = `${selectedTrip.city}, ${selectedTrip.administrativeDivision}, ${selectedTrip.country}`;
   }
 
@@ -752,7 +760,6 @@ async function findLocationPhotograph(imageData) {
      * while sending a request to the server, return it.
      */
     try {
-      console.log(serverResponse);
       if(serverResponse.imageID === null) {
         continue;
       }

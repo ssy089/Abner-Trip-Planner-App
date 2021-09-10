@@ -69,16 +69,17 @@ async function getAPIData(givenBaseURL, givenQuery) {
 
 /* DELETE route for client requests that need to delete one or more trip activities */
 app.delete('/tripActivities', function(req, res) {
-  const selectedData = req.body.selectedData; //Data selected for deletion
-  const activities = currentlySelectedTrip.activities; //List of activities for the currently selected trip
+  const selectedData = req.body.selectedData; //Data selected for deletion 
 
   /* If there is no currently selected trip, notify the client. */
   if(currentlySelectedTrip === null) {
     res.status = 200;
     res.json({message: 'There is no trip that is currently displayed.'});
   }
+
   /* Otherwise, delete one or more activities. */
   else {
+    const activities = currentlySelectedTrip.activities; //List of activities for the currently selected trip
 
     /* If the client requested to delete all activities, clear the activities list. */
     if(selectedData === 'all') {
@@ -116,7 +117,6 @@ app.post('/tripActivities', function(req, res) {
   /* Otherwise, add the activity to the currently selected trip's list of activities and return the list. */
   else {
     currentlySelectedTrip.activities.push(req.body.givenActivity);
-    listOfTrips[currentlySelectedIndex].activities.push(req.body.givenActivity);
     res.status = 200;
     res.json({message: "The activities list was updated", listOfActivities: currentlySelectedTrip.activities});
   }
@@ -131,7 +131,7 @@ app.post('/geographicCoordinates', function(req, res) {
   getAPIData(geonamesBaseURL, givenQuery).then(function(data) {
 
     /* Notify the user if no data could be found for the given city. */
-    if(data.totalResultsCount === 0) {
+    if(data.totalResultsCount.length === 0) {
       res.status = 200;
       res.json({message: 'The given city was not found.'});
     }

@@ -11,7 +11,7 @@ const bodyParser = require('body-parser'); //Used for parsing request bodies
 const cors = require('cors');              //Used for enabling CORS requests
 const express = require('express');        //Used for creating the server
 const fetch = require('node-fetch');       //Used for implementing the Fetch API
-const port = 8081;                         //Port number for the server
+const port = 80;                         //Port number for the server
 
 /* Set the API keys for the GeoNames API, Weatherbit Weather API, and Pixabay API. */
 const GEONAMES_USERNAME = process.env.GEONAMES_USERNAME;
@@ -38,7 +38,7 @@ app.use(express.static('./dist'));
 
 /* Start the local server. */
 const server = app.listen(port, function() {
-  console.log('Trip Planner App is running on http://localhost:8081');
+  console.log('Trip Planner App is running on http://localhost');
 });
 
 /*

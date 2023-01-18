@@ -303,7 +303,7 @@ function checkDateInput(listOfInputs) {
  */
 async function deleteServerData(givenData, givenRoute) {
   /* Send an HTTP DELETE request to the server. */
-  const serverResponse = await fetch('https://localhost/' + givenRoute, {
+  const serverResponse = await fetch('https://abner-vinaja-trip-planner-app.azurewebsites.net/' + givenRoute, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
@@ -824,7 +824,7 @@ function getDaysElapsed(startDate, endDate) {
  */
 async function getServerData(givenData, givenRoute) {
   /* Send an HTTP POST request to the server. */
-  const serverResponse = await fetch('https://localhost/' + givenRoute, {
+  const serverResponse = await fetch('https://abner-vinaja-trip-planner-app.azurewebsites.net/' + givenRoute, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -1235,7 +1235,7 @@ function generateTripData(submitEvent) {
  */
 async function updateServerData(givenData, givenRoute) {
   /* Send an HTTP PUT request to the server. */
-  const serverResponse = await fetch('https://localhost/' + givenRoute, {
+  const serverResponse = await fetch('https://abner-vinaja-trip-planner-app.azurewebsites.net/' + givenRoute, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
